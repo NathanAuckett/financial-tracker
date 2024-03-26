@@ -1,7 +1,6 @@
 const { sq } = require('../config/db_sequelize');
 const { DataTypes } = require('sequelize');
 
-
 export const User = sq.define('user', {
     user_id: {
         type: DataTypes.INTEGER,
@@ -21,10 +20,3 @@ export const User = sq.define('user', {
         allowNull: false
     }
 }, {freezeTableName: true});
-
-
-User.sync().then(() => {
-    console.log("User model synced!");
-});
-
-module.exports = User;

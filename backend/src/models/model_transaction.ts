@@ -1,8 +1,7 @@
 const { sq } = require('../config/db_sequelize');
 const { DataTypes } = require('sequelize');
 
-
-export const Transaction = sq.define('user', {
+export const Transaction = sq.define('transaction', {
     transaction_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -10,7 +9,11 @@ export const Transaction = sq.define('user', {
     },
     user_id: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+            model: 'user',
+            key: 'user_id'
+        }
     },
     category_id: {
         type: DataTypes.INTEGER
@@ -36,10 +39,3 @@ export const Transaction = sq.define('user', {
         type: DataTypes.CHAR(100)
     }
 }, {freezeTableName: true});
-
-
-Transaction.sync().then(() => {
-    console.log("Transaction model synced!");
-});
-
-module.exports = Transaction;

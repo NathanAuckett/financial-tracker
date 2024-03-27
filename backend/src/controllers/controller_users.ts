@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 
 
 // Sequelize
-import { User } from '../models/model_user';
+const { User } = require('../models/');
 function createUser(req: Request, res: Response) {
     const {name, email, password} = req.body;
 

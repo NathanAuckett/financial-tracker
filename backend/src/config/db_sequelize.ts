@@ -11,7 +11,7 @@ async function testConnection(){
         console.log("Sequelize connection established successfully");
     }
     catch (error){
-        console.log("Sequelize unable to connect to the database", error);
+        console.log("Sequelize unable to connect to the database: \n", error);
     }
 }
 

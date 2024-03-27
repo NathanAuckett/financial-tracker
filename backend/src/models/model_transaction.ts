@@ -9,11 +9,7 @@ export const Transaction = sq.define('transaction', {
     },
     user_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'user',
-            key: 'user_id'
-        }
+        allowNull: false
     },
     category_id: {
         type: DataTypes.INTEGER

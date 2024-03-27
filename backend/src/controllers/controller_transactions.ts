@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 
 
 // Sequelize
-import { Transaction } from '../models/model_transaction';
+const { Transaction } = require('../models/');
 
 function createTransaction(req: Request, res: Response) {
     const {name, email, password} = req.body;

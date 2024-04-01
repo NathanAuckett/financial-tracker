@@ -22,9 +22,10 @@ function serverStart(){
 }
 
 
-
-// Sync DB - Don't force in prod!
+// Sync DB then start server - Don't force in prod!
+import './models';
 const { sq, testConnection } = require('./config/db_sequelize');
+
 testConnection();
 sq.sync( {force: true} ).then( () => {
   console.log("Sequelize synced!");

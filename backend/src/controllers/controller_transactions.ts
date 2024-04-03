@@ -5,12 +5,10 @@ import {Request, Response} from 'express';
 const { Transaction } = require('../models/');
 
 function createTransaction(req: Request, res: Response) {
-    const {name, email, password} = req.body;
+    Transaction.create(req.body);
 
-    Transaction.create({
-        name: name,
-        email: email,
-        password: password
+    return res.status(201).json({
+        message: 'Transactions created successfully'
     });
 }
 

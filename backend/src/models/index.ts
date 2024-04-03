@@ -2,6 +2,8 @@
 const {User} = require('./model_user');
 const {Transaction} = require('./model_transaction');
 const {BankAccount} = require('./model_bank_account');
+const {Category} = require('./model_category');
+const {Pattern} = require('./model_pattern');
 
 // // Set associations between models
 // User.hasMany(Transaction, {foreignKey: "user_id"});
@@ -12,5 +14,7 @@ const {BankAccount} = require('./model_bank_account');
 module.exports = {
     User,
     Transaction,
-    BankAccount
+    BankAccount,
+    Category,
+    Pattern
 }

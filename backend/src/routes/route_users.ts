@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.post('/user', controller.createUser);
 
+router.get('/get-all', controller.getAllUsers);
+
 router.get("/", (req, res) => {
     res.send("insert users here");
 });

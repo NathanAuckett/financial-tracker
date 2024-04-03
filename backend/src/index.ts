@@ -6,6 +6,9 @@ const PORT = process.env.PORT || 3000;
 function serverStart(){
   const routerUsers = require("./routes/route_users");
   const routerTransactions = require("./routes/route_transactions");
+  const routerBankAccounts = require("./routes/route_bank_accounts");
+  const routerCategories = require("./routes/route_categories");
+  const routerPatterns = require("./routes/route_patterns");
 
   app.use(express.json());
 
@@ -14,6 +17,9 @@ function serverStart(){
   });
 
   app.use("/users", routerUsers);
+  app.use("/bank_accounts", routerBankAccounts);
+  app.use("/patterns", routerPatterns);
+  app.use("/categories", routerCategories);
   app.use("/transactions", routerTransactions);
 
   app.listen(PORT, () => {
@@ -23,7 +29,7 @@ function serverStart(){
 
 
 // Sync DB then start server - Don't force in prod!
-import './models';
+import './models/sq_associate_models';
 const { sq, testConnection } = require('./config/db_sequelize');
 
 testConnection();
@@ -31,5 +37,3 @@ sq.sync( {force: true} ).then( () => {
   console.log("Sequelize synced!");
   serverStart();
 });
-
-

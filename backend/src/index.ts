@@ -33,7 +33,7 @@ import './models/sq_associate_models';
 const { sq, testConnection } = require('./config/db_sequelize');
 
 testConnection();
-sq.sync( {force: true} ).then( () => {
+sq.sync( {force: false} ).then( () => {
   console.log("Sequelize synced!");
   serverStart();
 });

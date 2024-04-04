@@ -33,6 +33,9 @@ import './models/sq_associate_models';
 const { sq, testConnection } = require('./config/db_sequelize');
 
 testConnection();
+
+import './sq_associate_models'; //Associate SQ models
+
 sq.sync( {force: true} ).then( () => {
   console.log("Sequelize synced!");
   serverStart();

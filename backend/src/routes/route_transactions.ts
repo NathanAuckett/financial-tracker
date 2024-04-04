@@ -9,4 +9,8 @@ router.get("/", (req, res) => {
     res.send("insert transactions here");
 });
 
+router.get('/get-all', controller.getAllTransactions);
+
+router.get('/get-duplicates', controller.getDuplicates);
+
 module.exports = router;

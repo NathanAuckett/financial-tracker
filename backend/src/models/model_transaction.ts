@@ -23,10 +23,10 @@ export const Transaction = sq.define('transaction', {
         allowNull: false
     },
     credit: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.REAL,
     },
     debit: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.REAL,
     },
     description: {
         type: DataTypes.CHAR,

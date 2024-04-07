@@ -19,13 +19,13 @@ export const Pattern = sq.define('pattern', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    regex_string: {
-        type: DataTypes.TEXT,
+    regex_array: {
+        type: DataTypes.ARRAY(DataTypes.TEXT), //array of regex strings
         allowNull: false
     },
-    match: {
-        type: DataTypes.BOOLEAN,
+    match_array: { //match or don't match, parallel to regex_array
+        type: DataTypes.ARRAY(DataTypes.BOOLEAN),
         allowNull: false,
-        defaultValue: true
+        defaultValue: [true]
     }
 }, {freezeTableName: true});

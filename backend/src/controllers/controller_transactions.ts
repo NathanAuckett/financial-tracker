@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 const { sq } = require('../config/db_sequelize');
+import {Op} from 'sequelize'
 const { Transaction } = require('../models/');
 
 import {query as queryGetDuplicateTransactions} from '../queries/query_transaction_get_duplicates';
@@ -30,6 +31,7 @@ async function computeTransactionCategories(req: Request, res: Response){
 
         return res.status(201).json({
             message: `Categories computed for all user ${user_id} transactions!`,
+            result: results,
             categoriesCleared: metadata[0].rowCount,
             categoriesApplied: metadata[1].rowCount
         });
@@ -66,23 +68,30 @@ async function getTransactions(req: Request, res: Response){ //returns all trans
     });
 
     return res.status(201).json({
-        message: 'Transactions feteched',
+        message: 'Transactions fetched',
         transactions
     });
 }
 
-async function getTransactionsForUserLimited(req: Request, res: Response){ //takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
-    // Maybe allow for more than one category to be provided in future?
+//getTransactionsForUserLimited
+//Takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
+async function getTransactionsForUserLimited(req: Request, res: Response){
+    console.log(req.query);
+    const {limit, offset, user_id, account_id} = req.query;
+    const categories = req.query.category_ids as string;
     
-    const {limit, offset, user_id} = req.query;
-    const {categories} = req.body;
+    let categoriesArray:string[] = [];
+    if (categories){
+        categoriesArray = categories.split(",");
+    }
 
     const query = {
         limit: limit,
         offset: offset,
         where: {
             user_id: user_id,
-            ...(categories ? { category_ids: categories } : {}) //...spread provided categories into object if provided
+            ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
+            ...(categoriesArray.length ? {category_ids: { [Op.overlap]: categoriesArray}} : {}) 
         }
     }
 
@@ -94,6 +103,7 @@ async function getTransactionsForUserLimited(req: Request, res: Response){ //tak
         transactions
     });
 }
+
 
 async function getTransactionsTotals(req: Request, res:Response){ //Gets totals for credit and debit based on user_id and optional account_id
     const {user_id, account_id} = req.query;

@@ -11,8 +11,8 @@ export const Transaction = sq.define('transaction', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    category_id: {
-        type: DataTypes.INTEGER
+    category_ids: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER)
     },
     account_id: {
         type: DataTypes.INTEGER,

@@ -15,7 +15,7 @@ Transaction.belongsTo(User, {foreignKey: "user_id"});
 
 BankAccount.belongsTo(User, {foreignKey: "user_id"});
 
-Category.hasMany(Transaction, {foreignKey: "category_id"});
+//Category.hasMany(Transaction, {foreignKey: "category_id"});
 Category.hasMany(Pattern, {foreignKey: "category_id"});
 
 Pattern.belongsTo(User, {foreignKey: "user_id"});

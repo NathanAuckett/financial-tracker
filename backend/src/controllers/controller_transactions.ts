@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 const { sq } = require('../config/db_sequelize');
 import {Op} from 'sequelize'
 const { Transaction } = require('../models/');
+const { Category } = require('../models');
 
 import {query as queryGetDuplicateTransactions} from '../queries/query_transaction_get_duplicates';
 import transactionsCalculateCategories from '../queries/query_all_transactions_calculate_categories';
@@ -91,8 +92,9 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         where: {
             user_id: user_id,
             ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
-            ...(categoriesArray.length ? {category_ids: { [Op.overlap]: categoriesArray}} : {}) 
-        }
+            //Add method of filtering by category here. New DB model broke old method
+        },
+        include: Category
     }
 
     const transactions = await Transaction.findAll(query);

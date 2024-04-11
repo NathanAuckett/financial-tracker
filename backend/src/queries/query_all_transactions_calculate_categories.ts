@@ -1,10 +1,6 @@
 export default function transactionsCalculateCategories(user_id:number){
 	return `
-	-- Clear existing categories from transactions
-	UPDATE transaction
-	SET category_ids = array[]::integer[]
-	WHERE transaction.user_id = ${user_id}
-	AND category_ids != array[]::integer[];
+	TRUNCATE transaction_category;
 
 	-- Re-determine categories from scratch
 	WITH regex AS ( -- unnest the arrays into a table called regex
@@ -31,9 +27,9 @@ export default function transactionsCalculateCategories(user_id:number){
 		GROUP BY t1.transaction_id, regex.pattern_category_id
 	)
 
-	UPDATE transaction
-	SET category_ids = array_append(category_ids, matched_descriptions.pattern_category_id)
-	FROM matched_descriptions
+	INSERT INTO transaction_category ("transaction_id", "category_id", "createdAt", "updatedAt")
+	SELECT matched_descriptions.transaction_id, matched_descriptions.pattern_category_id, NOW(), NOW()
+	FROM matched_descriptions, transaction
 	WHERE matched_description IS NOT NULL
 	AND transaction.transaction_id = matched_descriptions.transaction_id;
 	`;

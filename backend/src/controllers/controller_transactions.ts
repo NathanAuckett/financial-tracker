@@ -92,9 +92,19 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         where: {
             user_id: user_id,
             ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
+            //...(categories ? { [Op.contains]: categories } : {}),
             //Add method of filtering by category here. New DB model broke old method
         },
-        include: Category
+        include: { //Work in progress. where: {} action as if 'required' is true and only returning rows that have a category
+            model: Category,
+            where: {
+                ...(categories ? {
+                    category_id: {
+                        [Op.contains]: categories }
+                    }
+                :{}),
+            }
+        }
     }
 
     const transactions = await Transaction.findAll(query);

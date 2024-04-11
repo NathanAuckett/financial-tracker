@@ -43,7 +43,4 @@ Category.belongsToMany(Transaction, {
 Pattern.belongsTo(User, {foreignKey: "user_id"});
 Pattern.hasOne(Category, {foreignKey: "category_id"});
 
-// TransactionCategory.hasOne(Transaction, {foreignKey: "transaction_id"});
-// TransactionCategory.hasOne(Category, {foreignKey: "category_id"});
-
 export {};

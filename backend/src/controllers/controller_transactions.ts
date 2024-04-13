@@ -77,7 +77,6 @@ async function getTransactions(req: Request, res: Response){ //returns all trans
 //getTransactionsForUserLimited
 //Takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
 async function getTransactionsForUserLimited(req: Request, res: Response){
-    console.log(req.query);
     const {limit, offset, user_id, account_id} = req.query;
     const categories = req.query.category_ids as string;
     
@@ -86,26 +85,28 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         categoriesArray = categories.split(",");
     }
 
+    console.log(categoriesArray);
+
     const query = {
         limit: limit,
         offset: offset,
         where: {
             user_id: user_id,
             ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
-            //...(categories ? { [Op.contains]: categories } : {}),
-            //Add method of filtering by category here. New DB model broke old method
         },
-        include: { //Work in progress. where: {} action as if 'required' is true and only returning rows that have a category
+        include: {
             model: Category,
-            where: {
-                ...(categories ? {
+            ...(categories ? { //Only use where when category id's are provided
+                where: {
                     category_id: {
-                        [Op.contains]: categories }
+                        [Op.in]: categoriesArray
                     }
-                :{}),
-            }
+                }
+            } : {})
         }
     }
+
+    console.log(query);
 
     const transactions = await Transaction.findAll(query);
 

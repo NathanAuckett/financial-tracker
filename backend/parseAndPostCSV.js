@@ -31,7 +31,7 @@ function translateCSVFields(dataSet, translationDictionary){
 function addUserIDToTransactionObjects(dataSet, userID){
     for (const entry of dataSet){
         entry.user_id = userID;
-        entry.account_id = 1;
+        entry.bank_account_id = 1;
     }
 }
 
@@ -52,7 +52,7 @@ const dict = {
     'Cheque Number': -1,
     'Debit': 'debit',
     'Credit': 'credit',
-    'Balance': -1,
+    'Balance': 'balance',
     'Transaction Type': -1
 }
 

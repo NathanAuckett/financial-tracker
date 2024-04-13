@@ -1,8 +1,7 @@
 import {Request, Response} from 'express';
 const { sq } = require('../config/db_sequelize');
 import {Op} from 'sequelize'
-const { Transaction } = require('../models/');
-const { Category } = require('../models');
+const { Transaction, Category, BankAccount } = require('../models/');
 
 import {query as queryGetDuplicateTransactions} from '../queries/query_transaction_get_duplicates';
 import transactionsCalculateCategories from '../queries/query_all_transactions_calculate_categories';
@@ -85,8 +84,6 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         categoriesArray = categories.split(",");
     }
 
-    console.log(categoriesArray);
-
     const query = {
         limit: limit,
         offset: offset,
@@ -94,19 +91,25 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
             user_id: user_id,
             ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
         },
-        include: {
-            model: Category,
-            ...(categories ? { //Only use where when category id's are provided
-                where: {
-                    category_id: {
-                        [Op.in]: categoriesArray
+        include: [
+            {
+                model: Category,
+                ...(categories ? { //Only use where when category id's are provided
+                    where: {
+                        category_id: {
+                            [Op.in]: categoriesArray
+                        }
                     }
-                }
-            } : {})
-        }
+                } : {})
+            },
+            {
+                model: BankAccount
+            }
+        ],
+        order: [
+            ["transaction_date", "DESC"]
+        ]
     }
-
-    console.log(query);
 
     const transactions = await Transaction.findAll(query);
 
@@ -119,24 +122,24 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
 
 
 async function getTransactionsTotals(req: Request, res:Response){ //Gets totals for credit and debit based on user_id and optional account_id
-    const {user_id, account_id} = req.query;
+    const {user_id, bank_account_id} = req.query;
     
     const totalCredit = await Transaction.sum("credit", {
         where: {
             user_id: user_id,
-            ...(account_id ? {account_id: account_id} : {})
+            ...(bank_account_id ? {account_id: bank_account_id} : {})
         }
     });
     const totalDebit = await Transaction.sum("debit", {
         where: {
             user_id: user_id,
-            ...(account_id ? {account_id: account_id} : {})
+            ...(bank_account_id ? {account_id: bank_account_id} : {})
         }
     });
 
     return res.status(201).json({
         message: `Totals calculated`,
-        account_id: account_id ? account_id : "Not provided",
+        account_id: bank_account_id ? bank_account_id : "Not provided",
         totalCredits: totalCredit,
         totalDebits: totalDebit,
         totalsCombined: totalCredit + totalDebit

@@ -4,8 +4,13 @@ import { FC } from "react";
 const columns = [
     {
         title: 'Account',
-        dataIndex: 'account_id',
-        key: 'account'
+        dataIndex: 'accountNumber',
+        key: 'accountNumber'
+    },
+    {
+        title: 'Account Name',
+        dataIndex: 'accountName',
+        key: 'accountName'
     },
     {
         title: 'Date',
@@ -28,9 +33,14 @@ const columns = [
         key: 'debit'
     },
     {
+        title: 'Balance',
+        dataIndex: 'balance',
+        key: 'balance'
+    },
+    {
         title: 'Categories',
-        dataIndex: 'category_ids',
-        key: 'category_ids'
+        dataIndex: 'categoryNamesConcat',
+        key: 'categories'
     }
 ]; 
 

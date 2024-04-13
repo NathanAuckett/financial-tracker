@@ -11,7 +11,7 @@ export const Transaction = sq.define('transaction', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    account_id: {
+    bank_account_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
@@ -20,15 +20,18 @@ export const Transaction = sq.define('transaction', {
         allowNull: false
     },
     credit: {
-        type: DataTypes.REAL,
+        type: DataTypes.REAL
     },
     debit: {
-        type: DataTypes.REAL,
+        type: DataTypes.REAL
     },
     description: {
-        type: DataTypes.CHAR,
+        type: DataTypes.CHAR
     },
     type: {
         type: DataTypes.CHAR(100)
+    },
+    balance: {
+        type: DataTypes.REAL
     }
 }, {freezeTableName: true});

@@ -22,6 +22,22 @@ function createBankAccount(req: Request, res: Response) {
     });
 }
 
+async function getBankAccounts(req:Request, res: Response) {
+    const { user_id } = req.query;
+    
+    const accounts = await BankAccount.findAll({
+        where: {
+            user_id: user_id
+        }
+    });
+    
+    return res.status(201).json({
+        message: 'Fetched bank accounts for user',
+        accounts
+    }); 
+}
+
 module.exports = {
-    createBankAccount
+    createBankAccount,
+    getBankAccounts
 }

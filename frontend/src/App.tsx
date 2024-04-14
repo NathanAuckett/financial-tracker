@@ -24,11 +24,6 @@ function transactionsConcatCategoryNames(transactionData: object[]){
     name:string
   }
 
-  type account = {
-    account_number:string,
-    name:string
-  }
-
   const transactions = transactionData as unknown as transaction[];
 
   transactions.forEach((transaction) => {
@@ -48,34 +43,52 @@ function transactionsConcatCategoryNames(transactionData: object[]){
   });
 }
 
+async function getTransactions(transactionsSetter:Function) {
+  await axios.get('http://localhost:3000/transactions/get-transactions-for-user-limited', {
+    params:{
+      user_id: 1,
+      account_id: null,
+      limit: null,
+      offset: null,
+      category_ids: null
+    }
+  })
+  .then((response) => {
+    const transactions = response.data.transactions;
+    
+    transactionsConcatCategoryNames(transactions);
+
+    //console.log(transactions);
+    transactionsSetter(transactions);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+}
+
+async function getAccounts(accountSetter:Function){
+  await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts?user_id=1', { //body gets ignored on get requests
+    headers: {
+      "columns": ["account_number"]
+    }
+  })
+  .then((response) => {
+    const accountNumbers = response.data;
+
+    console.log(accountNumbers);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+}
+
 function App() {
   const [transactions, setTransactions] = useState([]);
-
-  async function getTransactions() {
-    await axios.get('http://localhost:3000/transactions/get-transactions-for-user-limited?user_id=1&offset=0', {
-      params:{
-        user_id: 1,
-        account_id: null,
-        limit: null,
-        offset: null,
-        category_ids: null
-      }
-    })
-    .then((response) => {
-      const transactions = response.data.transactions;
-      
-      transactionsConcatCategoryNames(transactions);
-
-      console.log(transactions);
-      setTransactions(transactions);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
+  const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-    getTransactions();
+    getAccounts(setAccounts);
+    getTransactions(setTransactions);
   }, []);
 
   return (

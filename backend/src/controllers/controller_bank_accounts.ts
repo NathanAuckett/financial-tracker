@@ -24,8 +24,10 @@ function createBankAccount(req: Request, res: Response) {
 
 async function getBankAccounts(req:Request, res: Response) {
     const { user_id } = req.query;
+    const { columns } = req.body;
     
     const accounts = await BankAccount.findAll({
+        attributes: columns ? columns: null,
         where: {
             user_id: user_id
         }

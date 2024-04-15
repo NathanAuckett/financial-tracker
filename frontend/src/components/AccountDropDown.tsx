@@ -1,21 +1,8 @@
-import { FC, useState } from "react";
+import { FC, useState, useContext } from "react";
 import type { MenuProps } from "antd";
 import { Select } from "antd";
 
-const items: MenuProps["items"] = [
-  {
-    key: "1",
-    label: "Item 1",
-  },
-  {
-    key: "2",
-    label: "Item 2",
-  },
-  {
-    key: "3",
-    label: "Item 3",
-  },
-];
+import { UserContext } from "../App";
 
 interface props{
   accounts:object[],
@@ -33,7 +20,7 @@ type account = {
 const AccountDropDown:FC<props> = (props) => {
   const accounts = props.accounts as account[];
   const {getTransactions, setTransactions, setSelectedAccount} = props;
-  const [account, setAccount] = useState(1);
+  const { userID } = useContext(UserContext);
 
   const options:object[] = [];
 
@@ -52,8 +39,9 @@ const AccountDropDown:FC<props> = (props) => {
             defaultValue = {options[0]}
             options = {options}
             onChange = {(value) => {
+              console.log(value);
               setSelectedAccount(value);
-              getTransactions(setTransactions, 1, value)
+              getTransactions(setTransactions, userID, value)
             }}
         />
     )

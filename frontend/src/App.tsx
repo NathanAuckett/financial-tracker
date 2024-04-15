@@ -10,9 +10,14 @@ import axios from 'axios';
 import { Layout} from 'antd';
 const {Header} = Layout;
 
+interface UserContextType {
+  userID?: number,
+  setUserID?: Function
+}
+export const UserContext = React.createContext<UserContextType>({});
 
 async function getAccounts(accountsSetter:Function){
-  await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts?user_id=1', { //body gets ignored on get requests
+  await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts', { //body gets ignored on get requests
     params: {
       user_id: 1,
       columns: JSON.stringify(["bank_account_id", "account_number", "name"])
@@ -30,8 +35,8 @@ async function getAccounts(accountsSetter:Function){
 }
 
 
-
 function App() {
+  const [userID, setUserID] = useState(1);
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
@@ -42,16 +47,16 @@ function App() {
     <div className="App">
       <Layout>
         <Header style={{color: "white"}}>
-          Header lmao
+          Financial Tracker
         </Header>
+        <UserContext.Provider value={{userID, setUserID}}>
+          <Routes>
 
-        <Routes>
+            <Route path="/" element={<DataView accounts={accounts} />}/>
+            <Route path="/accounts" element={<Accounts accounts={accounts} />}/>
 
-          <Route path="/" element={<DataView accounts={accounts} />}/>
-          <Route path="/accounts" element={<Accounts accounts={accounts} />}/>
-
-        </Routes>
-
+          </Routes>
+        </UserContext.Provider>
       </Layout>
     </div>
   );

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useContext } from 'react';
 
 import TransactionTable from '../components/TransactionTable';
 import Chart from '../components/Chart';
@@ -6,8 +6,12 @@ import AccountDropDown from '../components/AccountDropDown';
 
 import axios from 'axios';
 
+import { UserContext } from "../App";
+
 import { Layout } from 'antd';
 const {Content, Sider} = Layout;
+
+
 
 function transactionsConcatCategoryNames(transactionData: object[]){
   type transaction = {
@@ -69,15 +73,15 @@ interface props {
 }
 
 const DataView:FC<props> = (props) => {
-    
+    const { userID } = useContext(UserContext);
     const [transactions, setTransactions] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(1);
 
     const { accounts } = props;
 
     useEffect(() => {
-        getTransactions(setTransactions, 1, selectedAccount);
-    }, []);
+        getTransactions(setTransactions, userID, selectedAccount);
+    }, [selectedAccount]);
 
     return (
         <>
@@ -85,10 +89,10 @@ const DataView:FC<props> = (props) => {
                 <Sider style={{color: "white"}}>
 
                     <AccountDropDown
-                    accounts={accounts}
-                    getTransactions={getTransactions}
-                    setTransactions={setTransactions}
-                    setSelectedAccount={setSelectedAccount}
+                      accounts={accounts}
+                      getTransactions={getTransactions}
+                      setTransactions={setTransactions}
+                      setSelectedAccount={setSelectedAccount}
                     />
 
                 </Sider>

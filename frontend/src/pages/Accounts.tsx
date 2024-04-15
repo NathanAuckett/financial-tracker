@@ -1,5 +1,9 @@
-import { FC } from "react";
+import { FC, useContext } from "react";
 import { Card, Col, Row, Button, Form, Input } from "antd";
+import type { FormProps } from "antd";
+import axios from "axios";
+
+import { UserContext } from "../App";
 
 interface account {
     bank_account_id:number,
@@ -11,9 +15,36 @@ interface props {
     accounts:account[]
 }
 
+type FieldType = {
+    username?: string;
+    password?: string;
+    remember?: string;
+};
+
+
+
 const Accounts:FC<props> = (props) => {
-    const {accounts} = props;
+    const { userID } = useContext(UserContext);
+    const { accounts } = props;
     
+    const handleSubmit:FormProps<FieldType>['onFinish'] = async (values) => {
+        console.log({
+            user_id: userID,
+            ...values
+        });
+        
+        await axios.post('http://localhost:3000/bank_accounts/bank_account', {
+            user_id: userID,
+            ...values
+        })
+        .then((response) => {
+            console.log(response.data);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
     return <>
         <Row gutter={16} justify={"center"}>
                 <Col span={8}>
@@ -24,14 +55,14 @@ const Accounts:FC<props> = (props) => {
                             wrapperCol={{ span: 16 }}
                             style={{ maxWidth: 600 }}
                             initialValues={{ remember: true }}
-                            // onFinish={onFinish}
+                            onFinish={handleSubmit}
                             // onFinishFailed={onFinishFailed}
                             autoComplete="off"
                         >
                         
                             <Form.Item
                                 label="Account Number"
-                                name="accountNumber"
+                                name="account_number"
                                 rules={[{ required: true, message: 'Please input the account number!' }]}
                             >
                                 <Input />
@@ -39,7 +70,7 @@ const Accounts:FC<props> = (props) => {
 
                             <Form.Item
                                 label="Account Name"
-                                name="accountName"
+                                name="name"
                                 rules={[{ required: true, message: 'Please input the account name!' }]}
                             >
                                 <Input />

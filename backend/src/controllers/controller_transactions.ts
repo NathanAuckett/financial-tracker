@@ -15,7 +15,36 @@ function addTransaction(req: Request, res: Response) { //Expects a transaction o
     });
 }
 
-function addBulkTransactions(req: Request, res: Response) { //expects and array of transaction objects
+async function addBulkTransactions(req: Request, res: Response) { //expects and array of transaction objects
+    const { user_id } = req.query;
+    const body = req.body;
+
+    const accounts = await BankAccount.findAll({
+        attributes: [
+            "bank_account_id",
+            "account_number"
+        ],
+        where: {
+            user_id: user_id
+        }
+    });
+
+    console.log(accounts);
+
+    interface transaction {
+        bank_account_id: string,
+        account_number: string
+    }
+
+    body.forEach((transaction:transaction) => {
+        const accountNumber = accounts.length;
+        for (let account = 0; account < accountNumber; account ++){
+            if (transaction.account_number == accounts[account].account_number){
+                transaction.bank_account_id = accounts[account].bank_account_id;
+            }
+        }
+    });
+
     Transaction.bulkCreate(req.body);
 
     return res.status(201).json({
@@ -76,7 +105,7 @@ async function getTransactions(req: Request, res: Response){ //returns all trans
 //getTransactionsForUserLimited
 //Takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
 async function getTransactionsForUserLimited(req: Request, res: Response){
-    const {limit, offset, user_id, account_id} = req.query;
+    const {limit, offset, user_id, bank_account_id} = req.query;
     const categories = req.query.category_ids as string;
     
     let categoriesArray:string[] = [];
@@ -89,7 +118,7 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         offset: offset,
         where: {
             user_id: user_id,
-            ...(account_id ? { account_id: account_id } : {}), //...spread provided categories into object if provided
+            ...(bank_account_id ? { bank_account_id: bank_account_id } : {}),
         },
         include: [
             {
@@ -107,7 +136,7 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
             }
         ],
         order: [
-            ["transaction_date", "DESC"]
+            ["createdAt", "DESC"]
         ]
     }
 

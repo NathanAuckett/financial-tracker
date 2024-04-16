@@ -13,7 +13,7 @@ const {Content, Sider} = Layout;
 
 
 
-function transactionsConcatCategoryNames(transactionData: object[]){
+function transactionsConcatCategoryNames(transactionData: object[]): void{
   type transaction = {
     categories:object[],
     categoryNamesConcat:string

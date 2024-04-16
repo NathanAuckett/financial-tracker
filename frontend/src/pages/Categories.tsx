@@ -1,66 +1,81 @@
-import { FC, useContext } from "react";
+import { FC, useEffect, useState, useContext } from 'react';
 import { Card, Col, Row, Button, Form, Input, Table } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
 import { UserContext } from "../App";
 
+
+async function getCategories(categorySetter:Function, user_id = 1) {
+    await axios.get('http://localhost:3000/categories/get_categories', {
+        params:{
+            user_id: user_id,
+            columns: JSON.stringify(["category_id", "name"])
+        }
+    })
+    .then((response) => {
+        const categories = response.data.categories;
+
+        console.log(categories);
+        categorySetter(categories);
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+}
+
+
 const columns = [
     {
-        title: 'Account Number',
-        dataIndex: 'account_number',
-        key: 'account_number',
+        title: 'ID',
+        dataIndex: 'category_id',
+        key: 'category_id',
         align: 'center' as const
     },
     {
-        title: 'Account Name',
+        title: 'Name',
         dataIndex: 'name',
         key: 'name',
         align: 'center' as const
     }
 ];
-interface account {
-    bank_account_id:number,
-    name:string,
-    account_number:string
-}
-
-type FieldType = {
-    username?: string;
-    password?: string;
-    remember?: string;
-};
 
 interface props {
-    accounts:account[]
-}
-const Accounts:FC<props> = (props) => {
-    const { userID } = useContext(UserContext);
-    const { accounts } = props;
     
-    const handleSubmit:FormProps<FieldType>['onFinish'] = async (values) => {
+}
+
+const Categories:FC<props> = (props) => {
+    const { userID } = useContext(UserContext);
+    const [categories, setCategories] = useState([]);
+
+    const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log({
             user_id: userID,
             ...values
         });
         
-        await axios.post('http://localhost:3000/bank_accounts/bank_account', {
+        await axios.post('http://localhost:3000/categories/category', {
             user_id: userID,
             ...values
         })
         .then((response) => {
             console.log(response.data);
+            getCategories(setCategories, userID);
         })
         .catch((error) => {
             console.log(error);
         });
     }
 
+    useEffect(() => {
+        getCategories(setCategories, userID);
+    }, [userID]);
+
     return <>
         <Row gutter={200} justify={"center"}>
-            <Card key={0} title="New Account" style={{width:800}}>
+            <Card key={0} title="New Category" style={{width:800}}>
                 <Form
-                    name="basic"
+                    name="category"
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}
@@ -71,17 +86,9 @@ const Accounts:FC<props> = (props) => {
                 >
                 
                     <Form.Item
-                        label="Account Number"
-                        name="account_number"
-                        rules={[{ required: true, message: 'Please input the account number!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Account Name"
+                        label="Name"
                         name="name"
-                        rules={[{ required: true, message: 'Please input the account name!' }]}
+                        rules={[{ required: true, message: 'Please input the category name!' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -96,9 +103,12 @@ const Accounts:FC<props> = (props) => {
             </Card>
         </Row>
         <Row gutter={16} justify={"center"}>
+            <h2>Categories</h2>
+        </Row>
+        <Row gutter={16} justify={"center"}>
             <Table
-                style={{width:800}}
-                dataSource={accounts}
+                style={{width:800, textAlign:"center"}}
+                dataSource={categories}
                 columns={columns}
                 pagination={false}
             />
@@ -106,5 +116,4 @@ const Accounts:FC<props> = (props) => {
     </>
 }
 
-
-export default Accounts;
+export default Categories;

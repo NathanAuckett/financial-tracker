@@ -9,4 +9,6 @@ router.get("/", (req, res) => {
     res.send("insert categories here");
 });
 
+router.get("/get_categories", controller.getCategories);
+
 module.exports = router;

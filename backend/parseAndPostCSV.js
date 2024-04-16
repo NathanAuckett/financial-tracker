@@ -31,7 +31,6 @@ function translateCSVFields(dataSet, translationDictionary){
 function addUserIDToTransactionObjects(dataSet, userID){
     for (const entry of dataSet){
         entry.user_id = userID;
-        entry.bank_account_id = 1;
     }
 }
 

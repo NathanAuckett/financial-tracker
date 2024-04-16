@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 
+//Pages
 import DataView from './pages/DataView';
 import Accounts from './pages/Accounts';
+import AddTransactions from './pages/AddTransactions';
+import Categories from './pages/Categories';
+import Patterns from './pages/Patterns';
 
 import axios from 'axios';
 
@@ -16,10 +20,10 @@ interface UserContextType {
 }
 export const UserContext = React.createContext<UserContextType>({});
 
-async function getAccounts(accountsSetter:Function){
+async function getAccounts(accountsSetter:Function, user_id = 1){
   await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts', { //body gets ignored on get requests
     params: {
-      user_id: 1,
+      user_id: user_id,
       columns: JSON.stringify(["bank_account_id", "account_number", "name"])
     }
   })
@@ -40,7 +44,7 @@ function App() {
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-    getAccounts(setAccounts);
+    getAccounts(setAccounts, userID);
   }, []);
 
   return (
@@ -54,6 +58,9 @@ function App() {
 
             <Route path="/" element={<DataView accounts={accounts} />}/>
             <Route path="/accounts" element={<Accounts accounts={accounts} />}/>
+            <Route path="/add-transactions" element={<AddTransactions/>}/>
+            <Route path="/categories" element={<Categories/>}/>
+            <Route path="/patterns" element={<Patterns/>}/>
 
           </Routes>
         </UserContext.Provider>

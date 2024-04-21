@@ -28,6 +28,6 @@ router.post('/add-bulk-transactions', controller.addBulkTransactions);
 
 router.post('/compute-transaction-categories', controller.computeTransactionCategories);
 
-router.post('/uploadCSV', upload.single("csv"), controller.uploadCSV);
+router.post('/uploadCSV', upload.single("file"), controller.uploadCSV);
 
 module.exports = router;

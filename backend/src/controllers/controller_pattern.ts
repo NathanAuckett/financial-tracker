@@ -5,12 +5,18 @@ import {Request, Response} from 'express';
 const { Pattern } = require('../models/');
 
 function createPattern(req: Request, res: Response) {
-    console.log(req.body);
-    Pattern.create(req.body);
-
-    return res.status(201).json({
-        message: 'Pattern created successfully',
-        pattern: req.body
+    
+    Pattern.create(req.body)
+    .then(() => {
+        return res.status(201).json({
+            message: 'Pattern created successfully',
+            pattern: req.body
+        });
+    })
+    .catch((error: object[]) => {
+        return res.status(400).json({
+            error
+        });
     });
 }
 
@@ -19,14 +25,11 @@ async function getPatterns(req:Request, res: Response) {
     const columns = JSON.parse(req.query.columns as string);
     
     const patterns = await Pattern.findAll({
-        attributes: columns ? columns: null,
-        where: {
-            user_id: user_id
-        }
+        attributes: columns ? columns: null
     });
     
     return res.status(201).json({
-        message: 'Fetched patterns for user',
+        message: 'Fetched patterns',
         patterns
     }); 
 }

@@ -10,14 +10,22 @@ function createCategory(req: Request, res: Response) {
     Category.create({
         user_id: user_id,
         name: name
-    });
+    })
+    .then(() => {
+        return res.status(201).json({
+            message: 'Category created successfully',
+            category: {
+                user_id,
+                name
+            }
+        });
+    })
+    .catch((error: object[]) =>{
+        console.log(error);
 
-    return res.status(201).json({
-        message: 'Category created successfully',
-        category: {
-            user_id,
-            name
-        }
+        return res.status(400).json({
+            error
+        });
     });
 }
 
@@ -37,6 +45,7 @@ async function getCategories(req:Request, res: Response) {
         categories
     }); 
 }
+
 module.exports = {
     createCategory,
     getCategories

@@ -13,6 +13,7 @@ function serverStart(){
   const routerBankAccounts = require("./routes/route_bank_accounts");
   const routerCategories = require("./routes/route_categories");
   const routerPatterns = require("./routes/route_patterns");
+  const routerPatternGroups = require("./routes/route_pattern_groups");
 
   app.use(express.json());
 
@@ -23,6 +24,7 @@ function serverStart(){
   app.use("/users", routerUsers);
   app.use("/bank_accounts", routerBankAccounts);
   app.use("/patterns", routerPatterns);
+  app.use("/pattern_groups", routerPatternGroups);
   app.use("/categories", routerCategories);
   app.use("/transactions", routerTransactions);
 

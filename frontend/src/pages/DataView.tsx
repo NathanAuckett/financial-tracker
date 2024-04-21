@@ -75,7 +75,7 @@ interface props {
 const DataView:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const [transactions, setTransactions] = useState([]);
-    const [selectedAccount, setSelectedAccount] = useState(1);
+    const [selectedAccount, setSelectedAccount] = useState(3);
 
     const { accounts } = props;
 

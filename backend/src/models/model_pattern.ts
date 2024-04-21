@@ -7,11 +7,7 @@ export const Pattern = sq.define('pattern', {
         primaryKey: true,
         autoIncrement: true
     },
-    user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    category_id: {
+    pattern_group_id: {
         type: DataTypes.INTEGER,
         allowNull: false
     },

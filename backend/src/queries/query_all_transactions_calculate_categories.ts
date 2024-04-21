@@ -2,35 +2,45 @@ export default function transactionsCalculateCategories(user_id:number){
 	return `
 	TRUNCATE transaction_category;
 
-	-- Re-determine categories from scratch
-	WITH regex AS ( -- unnest the arrays into a table called regex
-		SELECT category_id AS pattern_category_id, unnest(match_array) AS "match", unnest(regex_array) AS regex
-		FROM pattern
+	WITH users_groups AS (
+		SELECT *
+		FROM pattern_group
 		WHERE user_id = ${user_id}
 	),
-	matched_descriptions AS ( --define a table called "matched descriptions"
-		SELECT t1.transaction_id, t1.user_id, t1.description, regex.pattern_category_id, 
-			CASE 
-				WHEN EVERY( -- when every result is true
+	matched_descriptions AS (
+		SELECT 
+			t.transaction_id, 
+			t.user_id, 
+			t.description, 
+			ug.category_id AS pattern_category_id,
+			p.pattern_group_id,
+			MAX(CASE
+				WHEN EVERY(
 					CASE 
-						WHEN regex.match = true THEN -- if set to match, look for a match
-							t1.description ~* regex.regex
-						ELSE --else look for no match
-							t1.description !~* regex.regex
-					END) THEN
-						t1.description
-				ELSE NULL -- null if every doesn't return true. Meaning not every match returned a result.
-			END AS matched_description --put results in a column called "matched_description" within the matched_descriptions table
+						WHEN r."match" THEN t.description ~* r.regex
+						ELSE NOT (t.description ~* r.regex)
+					END
+				) THEN 1
+				ELSE 0
+			END) OVER (PARTITION BY t.transaction_id, p.pattern_id) AS match_flag
 		FROM 
-			transaction t1, regex
-		WHERE t1.user_id = ${user_id}
-		GROUP BY t1.transaction_id, regex.pattern_category_id
+			transaction t
+		CROSS JOIN 
+			users_groups ug
+		JOIN 
+			pattern p ON p.pattern_group_id = ug.pattern_group_id
+		JOIN 
+			unnest(p.match_array, p.regex_array) AS r("match", regex) ON true
+		WHERE 
+			t.user_id = ${user_id}
+		GROUP BY t.transaction_id, ug.category_id, p.pattern_group_id, p.pattern_id
 	)
 
 	INSERT INTO transaction_category ("transaction_id", "category_id", "createdAt", "updatedAt")
 	SELECT matched_descriptions.transaction_id, matched_descriptions.pattern_category_id, NOW(), NOW()
 	FROM matched_descriptions, transaction
-	WHERE matched_description IS NOT NULL
-	AND transaction.transaction_id = matched_descriptions.transaction_id;
+	WHERE matched_descriptions.match_flag = 1
+	AND transaction.transaction_id = matched_descriptions.transaction_id
+	ON CONFLICT DO NOTHING;
 	`;
 }

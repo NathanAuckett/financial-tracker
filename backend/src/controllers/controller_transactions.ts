@@ -8,11 +8,19 @@ import transactionsCalculateCategories from '../queries/query_all_transactions_c
 
 
 function addTransaction(req: Request, res: Response) { //Expects a transaction object
-    Transaction.create(req.body);
-
-    return res.status(201).json({
-        message: 'Single Transaction created successfully'
+    Transaction.create(req.body)
+    .then(() => {
+        return res.status(201).json({
+            message: 'Single Transaction created successfully'
+        });
+    })
+    .catch((error:object[]) => {
+        return res.status(400).json({
+            error
+        });
     });
+
+    
 }
 
 async function addBulkTransactions(req: Request, res: Response) { //expects and array of transaction objects
@@ -45,24 +53,44 @@ async function addBulkTransactions(req: Request, res: Response) { //expects and 
         }
     });
 
-    Transaction.bulkCreate(req.body);
+    Transaction.bulkCreate(req.body)
+    .then(() => {
+        return res.status(201).json({
+            message: 'Bulk Transactions created successfully'
+        });
+    })
+    .catch((error:object[]) => {
+        return res.status(400).json({
+            error
+        });
+    });;
 
-    return res.status(201).json({
-        message: 'Bulk Transactions created successfully'
-    });
+    
 }
 
 async function computeTransactionCategories(req: Request, res: Response){
+    interface QueryRes {
+        rowCount: number;
+    }
+    
     const { user_id } = req.query;
     
     if (user_id){
-        const [results, metadata] = await sq.query(transactionsCalculateCategories(user_id as unknown as number));
+        await sq.query(transactionsCalculateCategories(user_id as unknown as number))
+        .then((response:QueryRes[][]) => {
+            const [results, metadata] = response;
 
-        return res.status(201).json({
-            message: `Categories computed for all user ${user_id} transactions!`,
-            result: results,
-            categoriesCleared: metadata[0].rowCount,
-            categoriesApplied: metadata[1].rowCount
+            return res.status(201).json({
+                message: `Categories computed for all user ${user_id} transactions!`,
+                result: results,
+                categoriesCleared: metadata[0].rowCount,
+                categoriesApplied: metadata[1].rowCount
+            });
+        })
+        .catch((error:object[]) => {
+            return res.status(400).json({
+                error
+            });
         });
     }
     else{

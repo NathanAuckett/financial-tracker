@@ -23,22 +23,32 @@ function createPatternGroup(req: Request, res: Response) {
 
 async function getPatternGroups(req:Request, res: Response) {
     const { user_id } = req.query;
+    const columns = req.query.columns ? JSON.parse(req.query.columns as string) : null;
     
-    const patternGroups = await PatternGroup.findAll({
+    await PatternGroup.findAll({
         where: {
             user_id: user_id
         },
+        ...(columns ? {attributes: columns} : {}),
         include: [
             {
-                model: Pattern
+                model: Pattern,
+                attributes: ["pattern_id", "name", "regex_array", "match_array"]
             }
         ],
+    })
+    .then((patternGroups:object[]) => {
+        return res.status(201).json({
+            message: 'Fetched pattern groups for user',
+            patternGroups
+        }); 
+    })
+    .catch((error:object[]) => {
+        return res.status(400).json({
+            error
+        }); 
     });
 
-    return res.status(201).json({
-        message: 'Fetched pattern groups for user',
-        patternGroups
-    }); 
 }
 
 module.exports = {

@@ -81,7 +81,7 @@ const DataView:FC<props> = (props) => {
 
     useEffect(() => {
         getTransactions(setTransactions, userID, selectedAccount);
-    }, [selectedAccount]);
+    }, [userID, selectedAccount]);
 
     return (
         <>

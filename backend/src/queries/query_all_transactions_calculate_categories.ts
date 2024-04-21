@@ -40,7 +40,6 @@ export default function transactionsCalculateCategories(user_id:number){
 	SELECT matched_descriptions.transaction_id, matched_descriptions.pattern_category_id, NOW(), NOW()
 	FROM matched_descriptions, transaction
 	WHERE matched_descriptions.match_flag = 1
-	AND transaction.transaction_id = matched_descriptions.transaction_id
-	ON CONFLICT DO NOTHING;
+	AND transaction.transaction_id = matched_descriptions.transaction_id;
 	`;
 }

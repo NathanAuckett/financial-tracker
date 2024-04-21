@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useContext } from 'react';
-import { Card, Col, Row, Button, Form, Input, Table } from "antd";
+import { Card, Col, Row, Button, Form, Input, Table, Flex, Layout} from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -70,6 +70,7 @@ const Categories:FC<props> = (props) => {
     useEffect(() => {
         getCategories(setCategories, userID);
     }, [userID]);
+
 
     return <>
         <Row gutter={200} justify={"center"}>

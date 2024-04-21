@@ -1,10 +1,149 @@
 import {Request, Response} from 'express';
-const { sq } = require('../config/db_sequelize');
 import {Op} from 'sequelize'
+const { sq } = require('../config/db_sequelize');
 const { Transaction, Category, BankAccount } = require('../models/');
+const fs = require('fs');
+const csv = require('csv-parse/sync');
 
 import {query as queryGetDuplicateTransactions} from '../queries/query_transaction_get_duplicates';
 import transactionsCalculateCategories from '../queries/query_all_transactions_calculate_categories';
+
+interface FileUploadRequest extends Request {
+    file?:object
+}
+async function uploadCSV(req:FileUploadRequest, res:Response){
+    let { user_id } = req.query ? req.query : {user_id: 1};
+    type FileType = {
+        path: string
+    }
+
+    if (user_id === undefined){
+        return res.status(400).json({
+            error:"user_id is undefined"
+        });
+    }
+    
+    console.log(req.file);
+    const file = req.file as FileType;
+
+    await fs.readFile(file.path, "utf8", async (err:object[], data:string) => {
+        if (err){
+            console.log(err);
+            return res.status(400).json({
+                err
+            });
+        }
+
+        fs.unlink(file.path, (err:object[]) => {
+            if (err){
+                console.log(err);
+            }
+        });
+        
+        let records = csv.parse(data, {columns: true, skip_empty_lines: true, cast: true});
+
+        const dict = {
+            'BSB Number': "-1",
+            'Account Number': 'account_number',
+            'Transaction Date': 'transaction_date',
+            'Narration': 'description',
+            'Cheque Number': "-1",
+            'Debit': 'debit',
+            'Credit': 'credit',
+            'Balance': 'balance',
+            'Transaction Type': "-1"
+        }
+
+        interface TranslationDictionary {
+            [key:string]: string
+        }
+        interface Transaction {
+            user_id: string
+            transaction_date: string
+        }
+        function translateCSVFields(dataSet:Transaction[], translationDictionary:TranslationDictionary){
+            const data = [];
+            for (const entry of dataSet){
+                const newObj: Record<string, string | null> = {}
+                const keys = Object.keys(entry) as Array<keyof Transaction>;
+        
+                keys.forEach((key) => {
+                    const newKey = translationDictionary[key] as string;
+                    if (newKey != "-1"){
+                        newObj[newKey] = entry[key] as typeof Transaction;
+                        
+                        if (newObj[newKey] == ""){
+                            newObj[newKey] = null;
+                        }
+                    }
+                })
+        
+                data.push(newObj);
+            }
+            return data;
+        }
+        
+        function addUserIDToTransactionObjects(dataSet:Transaction[], userID:string){
+            for (const entry of dataSet){
+                entry.user_id = userID;
+            }
+        }
+        
+        function convertDates(dataSet:Transaction[]){
+            for (const entry of dataSet){
+                const oldDate = entry.transaction_date;
+                const dateSplit = oldDate.split("/");
+                entry.transaction_date = dateSplit[2] + "/" + dateSplit[1] + "/" + dateSplit[0];
+            }
+        }
+
+        records = translateCSVFields(records, dict);
+        addUserIDToTransactionObjects(records, user_id.toString());
+        convertDates(records);
+
+        console.log(records);
+        
+        const accounts = await BankAccount.findAll({
+            attributes: [
+                "bank_account_id",
+                "account_number"
+            ],
+            where: {
+                user_id: user_id
+            }
+        });
+    
+        interface transaction {
+            bank_account_id: string,
+            account_number: string
+        }
+    
+        records.forEach((transaction:transaction) => {
+            const accountNumber = accounts.length;
+            for (let account = 0; account < accountNumber; account ++){
+                if (transaction.account_number == accounts[account].account_number){
+                    transaction.bank_account_id = accounts[account].bank_account_id;
+                    break;
+                }
+            }
+            if (transaction.bank_account_id == undefined){
+                transaction.bank_account_id = "1";
+            }
+        });
+    
+        Transaction.bulkCreate(req.body)
+        .then(() => {
+            return res.status(201).json({
+                message: 'Bulk Transactions created successfully'
+            });
+        })
+        .catch((error:object[]) => {
+            return res.status(400).json({
+                error
+            });
+        });
+    });
+}
 
 
 function addTransaction(req: Request, res: Response) { //Expects a transaction object
@@ -37,8 +176,6 @@ async function addBulkTransactions(req: Request, res: Response) { //expects and 
         }
     });
 
-    console.log(accounts);
-
     interface transaction {
         bank_account_id: string,
         account_number: string
@@ -63,9 +200,7 @@ async function addBulkTransactions(req: Request, res: Response) { //expects and 
         return res.status(400).json({
             error
         });
-    });;
-
-    
+    });
 }
 
 async function computeTransactionCategories(req: Request, res: Response){
@@ -211,5 +346,6 @@ module.exports = {
     getTransactions,
     getTransactionsForUserLimited,
     computeTransactionCategories,
-    getTransactionsTotals
+    getTransactionsTotals,
+    uploadCSV
 }

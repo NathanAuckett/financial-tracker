@@ -1,7 +1,11 @@
 import express from "express";
+const router = express.Router();
+
 const controller = require('../controllers/controller_transactions');
 
-const router = express.Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({dest: "../csvUploads"});
 
 router.get("/", (req, res) => {
     res.send("insert transactions here");
@@ -23,5 +27,7 @@ router.post('/add-transaction', controller.addTransaction);
 router.post('/add-bulk-transactions', controller.addBulkTransactions);
 
 router.post('/compute-transaction-categories', controller.computeTransactionCategories);
+
+router.post('/uploadCSV', upload.single("csv"), controller.uploadCSV);
 
 module.exports = router;

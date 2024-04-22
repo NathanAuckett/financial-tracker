@@ -108,7 +108,7 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
         addUserIDToTransactionObjects(records, user_id.toString());
         convertDates(records);
 
-        //console.log(records);
+        console.log(records);
         
         const accounts = await BankAccount.findAll({
             attributes: [
@@ -119,7 +119,7 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
                 user_id: user_id
             }
         });
-    
+
         interface transaction {
             bank_account_id: string,
             account_number: string
@@ -138,7 +138,7 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
             }
         });
     
-        Transaction.bulkCreate(req.body)
+        Transaction.bulkCreate(records)
         .then(() => {
             return res.status(201).json({
                 message: 'Bulk Transactions created successfully'

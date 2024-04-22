@@ -74,7 +74,11 @@ const AddTransactions:FC<props> = (props) => {
                     name="csv_file"
                     rules={[{ required: true, message: 'Please select a CSV file containing your transactions!' }]}
                 >
-                    <Input type="file" onChange={handleFileChange}/>
+                    <Input
+                        type="file"
+                        onChange={handleFileChange}
+                        accept='text/csv'
+                    />
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 2, span: 16 }}>

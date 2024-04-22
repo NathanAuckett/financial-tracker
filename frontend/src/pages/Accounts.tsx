@@ -19,7 +19,8 @@ const columns = [
         align: 'center' as const
     }
 ];
-interface account {
+
+type Account = {
     bank_account_id:number,
     name:string,
     account_number:string
@@ -32,7 +33,7 @@ type FieldType = {
 };
 
 interface props {
-    accounts:account[]
+    accounts:Account[]
 }
 const Accounts:FC<props> = (props) => {
     const { userID } = useContext(UserContext);

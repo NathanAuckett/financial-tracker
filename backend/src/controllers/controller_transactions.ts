@@ -12,6 +12,7 @@ interface FileUploadRequest extends Request {
     file?:object
 }
 async function uploadCSV(req:FileUploadRequest, res:Response){
+    console.log(req);
     let { user_id } = req.query ? req.query : {user_id: 1};
     type FileType = {
         path: string
@@ -20,6 +21,12 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
     if (user_id === undefined){
         return res.status(400).json({
             error:"user_id is undefined"
+        });
+    }
+
+    if (req.file === undefined){
+        return res.status(400).json({
+            error:"file is undefined"
         });
     }
     
@@ -101,7 +108,7 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
         addUserIDToTransactionObjects(records, user_id.toString());
         convertDates(records);
 
-        console.log(records);
+        //console.log(records);
         
         const accounts = await BankAccount.findAll({
             attributes: [

@@ -14,6 +14,7 @@ function serverStart(){
   const routerCategories = require("./routes/route_categories");
   const routerPatterns = require("./routes/route_patterns");
   const routerPatternGroups = require("./routes/route_pattern_groups");
+  const routerCSVDictionary = require("./routes/route_csv_dictionary");
 
   app.use(express.json());
 
@@ -27,6 +28,7 @@ function serverStart(){
   app.use("/pattern_groups", routerPatternGroups);
   app.use("/categories", routerCategories);
   app.use("/transactions", routerTransactions);
+  app.use("/csv_dictionaries", routerCSVDictionary);
 
   app.listen(PORT, () => {
     console.log(`API listening on port: ${PORT}`);

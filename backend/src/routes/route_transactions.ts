@@ -17,8 +17,6 @@ router.get('/get-duplicates', controller.getDuplicates);
 
 router.get('/get-transactions', controller.getTransactions);
 
-router.get('/get-transactions-for-user-limited', controller.getTransactionsForUserLimited);
-
 router.get('/get-transactions-totals', controller.getTransactionsTotals);
 
 //Post

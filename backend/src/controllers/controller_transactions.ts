@@ -8,11 +8,7 @@ const csv = require('csv-parse/sync');
 import {query as queryGetDuplicateTransactions} from '../queries/query_transaction_get_duplicates';
 import transactionsCalculateCategories from '../queries/query_all_transactions_calculate_categories';
 
-interface FileUploadRequest extends Request {
-    file?:object
-}
-async function uploadCSV(req:FileUploadRequest, res:Response){
-    console.log(req);
+async function uploadCSV(req:Request & {file?:object}, res:Response){
     let { user_id } = req.query ? req.query : {user_id: 1};
     type FileType = {
         path: string
@@ -30,7 +26,6 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
         });
     }
     
-    console.log(req.file);
     const file = req.file as FileType;
 
     await fs.readFile(file.path, "utf8", async (err:object[], data:string) => {
@@ -107,8 +102,6 @@ async function uploadCSV(req:FileUploadRequest, res:Response){
         records = translateCSVFields(records, dict);
         addUserIDToTransactionObjects(records, user_id.toString());
         convertDates(records);
-
-        console.log(records);
         
         const accounts = await BankAccount.findAll({
             attributes: [
@@ -260,24 +253,13 @@ async function getDuplicates(req: Request, res: Response){ //returns duplicate t
         results
     });
 }
-
-async function getTransactions(req: Request, res: Response){ //returns all transactions that match query parameters in request
-    const transactions = await Transaction.findAll({
-        where: req.query
-    });
-
-    return res.status(201).json({
-        message: 'Transactions fetched',
-        transactions
-    });
-}
-
 //getTransactionsForUserLimited
 //Takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
-async function getTransactionsForUserLimited(req: Request, res: Response){
-    const {limit, offset, user_id, bank_account_id} = req.query;
-    const categories = req.query.category_ids as string;
-    
+async function getTransactions(req: Request, res: Response){
+    const {limit, offset, user_id, category_ids, ...queries} = req.query;
+
+    //split comma separated categories into array
+    const categories = category_ids as string;
     let categoriesArray:string[] = [];
     if (categories){
         categoriesArray = categories.split(",");
@@ -288,7 +270,7 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         offset: offset,
         where: {
             user_id: user_id,
-            ...(bank_account_id ? { bank_account_id: bank_account_id } : {}),
+            ...(queries ? { ...queries } : {}),
         },
         include: [
             {
@@ -310,12 +292,20 @@ async function getTransactionsForUserLimited(req: Request, res: Response){
         ]
     }
 
-    const transactions = await Transaction.findAll(query);
-
-    return res.status(201).json({
-        message: `${transactions.length} of max ${limit} transactions for user_id ${user_id} fetched. Offset: ${offset}`,
-        categories: categories ? categories : "not provided",
-        transactions
+    await Transaction.findAll(query)
+    .then((response: {rowCount: number}[][]) => {
+        const [results, metadata] = response;
+        
+        return res.status(201).json({
+            message: `${results.length} of max ${limit} transactions for user_id ${user_id} fetched. Offset: ${offset}`,
+            categories: categories ? categories : "not provided",
+            transactions: results
+        });
+    })
+    .catch((error:Error) => {
+        return res.status(400).json({
+            error: error.message
+        });
     });
 }
 
@@ -351,7 +341,6 @@ module.exports = {
     getAllTransactions,
     getDuplicates,
     getTransactions,
-    getTransactionsForUserLimited,
     computeTransactionCategories,
     getTransactionsTotals,
     uploadCSV

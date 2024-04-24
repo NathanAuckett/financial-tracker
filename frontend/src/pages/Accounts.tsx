@@ -1,5 +1,5 @@
 import { FC, useContext } from "react";
-import { Card, Col, Row, Button, Form, Input, Table } from "antd";
+import { Card, Row, Button, Form, Input, Table } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -20,20 +20,19 @@ const columns = [
     }
 ];
 
-type Account = {
+export type AccountType = {
     bank_account_id:number,
     name:string,
     account_number:string
 }
 
 type FieldType = {
-    username?: string;
-    password?: string;
-    remember?: string;
+    account_number: string;
+    name: string;
 };
 
 interface props {
-    accounts:Account[]
+    accounts:AccountType[]
 }
 const Accounts:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
@@ -61,7 +60,7 @@ const Accounts:FC<props> = (props) => {
         <Row gutter={200} justify={"center"}>
             <Card key={0} title="New Account" style={{width:800}}>
                 <Form
-                    name="basic"
+                    name="account"
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 600 }}

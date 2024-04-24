@@ -8,6 +8,7 @@ import Accounts from './pages/Accounts';
 import AddTransactions from './pages/AddTransactions';
 import Categories from './pages/Categories';
 import Patterns from './pages/Patterns';
+import CSVDictionaries from './pages/CSVDictionaries';
 
 import axios from 'axios';
 
@@ -56,11 +57,12 @@ function App() {
         <UserContext.Provider value={{userID, setUserID}}>
           <Routes>
 
-            <Route path="/" element={<DataView accounts={accounts} />}/>
-            <Route path="/accounts" element={<Accounts accounts={accounts} />}/>
-            <Route path="/add-transactions" element={<AddTransactions/>}/>
-            <Route path="/categories" element={<Categories/>}/>
-            <Route path="/patterns" element={<Patterns/>}/>
+            <Route path="/" element={<DataView accounts={accounts} />} />
+            <Route path="/accounts" element={<Accounts accounts={accounts} />} />
+            <Route path="/add-transactions" element={<AddTransactions/>} />
+            <Route path="/categories" element={<Categories/>} />
+            <Route path="/patterns" element={<Patterns/>} />
+            <Route path="/csv-dictionaries" element={<CSVDictionaries/>} />
 
           </Routes>
         </UserContext.Provider>

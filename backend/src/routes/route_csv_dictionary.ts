@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/dictionary', controller.createDictionary);
 
-router.get('/get-all', controller.getAllDictionaries);
+router.get('/get-dictionaries', controller.getDictionaries);
 
 router.get("/", (req, res) => {
     res.send("insert csv dictionaries here");

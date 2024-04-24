@@ -39,21 +39,6 @@ const AddTransactions:FC<props> = (props) => {
             console.log(error);
         });
 
-        // await axios.post(`http://localhost:3000/transactions/uploadCSV?user_id=${userID}`,
-        // {
-        //     formData
-        // },
-        // {
-        //     headers: {
-        //         "Content-Type": "multipart/form-data"
-        // })
-        // .then((response) => {
-        //     console.log(response.data);
-        // })
-        // .catch((error) => {
-        //     console.log(error);
-        // });
-
     }
 
     const handleFileChange = (e: React.FormEvent<HTMLInputElement>) => {

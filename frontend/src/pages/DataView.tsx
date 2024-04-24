@@ -46,7 +46,7 @@ function transactionsConcatCategoryNames(transactionData: object[]): void{
 }
 
 async function getTransactions(transactionsSetter:Function, user_id = 1, bank_account_id = 1) {
-  await axios.get('http://localhost:3000/transactions/get-transactions-for-user-limited', {
+  await axios.get('http://localhost:3000/transactions/get-transactions', {
     params:{
       user_id: user_id,
       bank_account_id: bank_account_id,
@@ -57,10 +57,12 @@ async function getTransactions(transactionsSetter:Function, user_id = 1, bank_ac
   })
   .then((response) => {
     const transactions = response.data.transactions;
+    console.log("Transactions: ", transactions);
     
-    transactionsConcatCategoryNames(transactions);
-
-    console.log(transactions);
+    if (transactions.length > 0){
+      transactionsConcatCategoryNames(transactions);
+    }
+    
     transactionsSetter(transactions);
   })
   .catch((error) => {
@@ -75,7 +77,7 @@ interface props {
 const DataView:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const [transactions, setTransactions] = useState([]);
-    const [selectedAccount, setSelectedAccount] = useState(3);
+    const [selectedAccount, setSelectedAccount] = useState(1);
 
     const { accounts } = props;
 

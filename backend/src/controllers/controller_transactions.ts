@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {Op} from 'sequelize'
 const { sq } = require('../config/db_sequelize');
-const { Transaction, Category, BankAccount } = require('../models/');
+const { Transaction, Category, BankAccount, CSVDictionary } = require('../models/');
 const fs = require('fs');
 const csv = require('csv-parse/sync');
 
@@ -9,7 +9,8 @@ import {query as queryGetDuplicateTransactions} from '../queries/query_transacti
 import transactionsCalculateCategories from '../queries/query_all_transactions_calculate_categories';
 
 async function uploadCSV(req:Request & {file?:object}, res:Response){
-    let { user_id } = req.query ? req.query : {user_id: 1};
+    let { user_id } = req.query;
+    const csv_dictionary_id = 1;
     type FileType = {
         path: string
     }
@@ -44,17 +45,17 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
         
         let records = csv.parse(data, {columns: true, skip_empty_lines: true, cast: true});
 
-        const dict = {
-            'BSB Number': "-1",
-            'Account Number': 'account_number',
-            'Transaction Date': 'transaction_date',
-            'Narration': 'description',
-            'Cheque Number': "-1",
-            'Debit': 'debit',
-            'Credit': 'credit',
-            'Balance': 'balance',
-            'Transaction Type': "-1"
-        }
+        // const dict = {
+        //     'BSB Number': "-1",
+        //     'Account Number': 'account_number',
+        //     'Transaction Date': 'transaction_date',
+        //     'Narration': 'description',
+        //     'Cheque Number': "-1",
+        //     'Debit': 'debit',
+        //     'Credit': 'credit',
+        //     'Balance': 'balance',
+        //     'Transaction Type': "-1"
+        // }
 
         interface TranslationDictionary {
             [key:string]: string
@@ -68,9 +69,18 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
             for (const entry of dataSet){
                 const newObj: Record<string, string | null> = {}
                 const keys = Object.keys(entry) as Array<keyof Transaction>;
-        
+                const translationKeys = Object.keys(translationDictionary) as string[];
+
                 keys.forEach((key) => {
-                    const newKey = translationDictionary[key] as string;
+                    let newKey = "-1";
+                    //Find key in dictionary based on key of this entry
+                    for (let i = 0; i < translationKeys.length; i ++){
+                        if (translationDictionary[translationKeys[i]] === key){
+                            newKey = translationKeys[i];
+                            break;
+                        }
+                    }
+                    
                     if (newKey != "-1"){
                         newObj[newKey] = entry[key] as typeof Transaction;
                         
@@ -98,11 +108,26 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
                 entry.transaction_date = dateSplit[2] + "/" + dateSplit[1] + "/" + dateSplit[0];
             }
         }
-
-        records = translateCSVFields(records, dict);
-        addUserIDToTransactionObjects(records, user_id.toString());
-        convertDates(records);
         
+        let dictionary = {};
+
+        await CSVDictionary.findOne({
+            attributes: ["bank_name", "account_number", "transaction_date", "credit", "debit", "description", "type", "balance"],
+            where: {
+                user_id: user_id,
+                csv_dictionary_id: csv_dictionary_id
+            }
+        })
+        .then((results:{dataValues:object}) => {
+            dictionary = results.dataValues;
+        })
+        .catch((error:Error) => {
+            return res.status(400).json({
+                message: `Unable to find CSV dictionary with user_id:${user_id} and/or csv_dictionary_id:${csv_dictionary_id}`,
+                error: error.message
+            });
+        });
+
         const accounts = await BankAccount.findAll({
             attributes: [
                 "bank_account_id",
@@ -111,8 +136,19 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
             where: {
                 user_id: user_id
             }
+        })
+        .catch((error:Error) => {
+            return res.status(400).json({
+                error: error.message
+            });
         });
 
+        console.log(dictionary);
+        
+
+        records = translateCSVFields(records, dictionary);
+        addUserIDToTransactionObjects(records, user_id.toString());
+        convertDates(records);
         interface transaction {
             bank_account_id: string,
             account_number: string
@@ -253,8 +289,8 @@ async function getDuplicates(req: Request, res: Response){ //returns duplicate t
         results
     });
 }
-//getTransactionsForUserLimited
-//Takes a user_id, limit and offset > returns limit of transactions, page offset by offset, with the supplied user_id
+
+
 async function getTransactions(req: Request, res: Response){
     const {limit, offset, user_id, category_ids, ...queries} = req.query;
 
@@ -292,14 +328,24 @@ async function getTransactions(req: Request, res: Response){
         ]
     }
 
+    console.log(query);
+
     await Transaction.findAll(query)
-    .then((response: {rowCount: number}[][]) => {
-        const [results, metadata] = response;
+    .then((response:object[]) => {
+        // console.log(response);
+        // let [results, metadata] = response;
+
+        // if (results === undefined){
+        //     results = [];
+        // }
+        // if (!Array.isArray(results)){
+        //     results = [results];
+        // }
         
         return res.status(201).json({
-            message: `${results.length} of max ${limit} transactions for user_id ${user_id} fetched. Offset: ${offset}`,
+            message: `${response.length} of max ${limit} transactions for user_id ${user_id} fetched. Offset: ${offset}`,
             categories: categories ? categories : "not provided",
-            transactions: results
+            transactions: response
         });
     })
     .catch((error:Error) => {

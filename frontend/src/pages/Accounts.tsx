@@ -5,6 +5,12 @@ import axios from "axios";
 
 import { UserContext } from "../App";
 
+export type AccountType = {
+    bank_account_id:number,
+    name:string,
+    account_number:string
+}
+
 const columns = [
     {
         title: 'Account Number',
@@ -20,16 +26,6 @@ const columns = [
     }
 ];
 
-export type AccountType = {
-    bank_account_id:number,
-    name:string,
-    account_number:string
-}
-
-type FieldType = {
-    account_number: string;
-    name: string;
-};
 
 interface props {
     accounts:AccountType[]
@@ -38,12 +34,11 @@ const Accounts:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const { accounts } = props;
     
+    type FieldType = {
+        account_number: string;
+        name: string;
+    };
     const handleSubmit:FormProps<FieldType>['onFinish'] = async (values) => {
-        console.log({
-            user_id: userID,
-            ...values
-        });
-        
         await axios.post('http://localhost:3000/bank_accounts/bank_account', {
             user_id: userID,
             ...values
@@ -51,8 +46,8 @@ const Accounts:FC<props> = (props) => {
         .then((response) => {
             console.log(response.data);
         })
-        .catch((error) => {
-            console.log(error);
+        .catch((error:Error) => {
+            console.log(error.message);
         });
     }
 
@@ -70,7 +65,7 @@ const Accounts:FC<props> = (props) => {
                     autoComplete="off"
                 >
                 
-                    <Form.Item
+                    <Form.Item<FieldType>
                         label="Account Number"
                         name="account_number"
                         rules={[{ required: true, message: 'Please input the account number!' }]}
@@ -78,7 +73,7 @@ const Accounts:FC<props> = (props) => {
                         <Input />
                     </Form.Item>
 
-                    <Form.Item
+                    <Form.Item<FieldType>
                         label="Account Name"
                         name="name"
                         rules={[{ required: true, message: 'Please input the account name!' }]}
@@ -105,6 +100,5 @@ const Accounts:FC<props> = (props) => {
         </Row>
     </>
 }
-
 
 export default Accounts;

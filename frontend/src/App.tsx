@@ -29,10 +29,9 @@ async function getAccounts(accountsSetter:Function, user_id = 1){
     }
   })
   .then((response) => {
-    const accounts = response.data;
-
-    console.log(accounts);
-    accountsSetter(accounts.accounts);
+    const accounts = response.data.accounts;
+    console.log("Fetched Accounts", accounts);
+    accountsSetter(accounts);
   })
   .catch((error) => {
     console.log(error);
@@ -46,7 +45,7 @@ function App() {
 
   useEffect(() => {
     getAccounts(setAccounts, userID);
-  }, []);
+  }, [userID]);
 
   return (
     <div className="App">
@@ -54,6 +53,7 @@ function App() {
         <Header style={{color: "white"}}>
           Financial Tracker
         </Header>
+        
         <UserContext.Provider value={{userID, setUserID}}>
           <Routes>
 

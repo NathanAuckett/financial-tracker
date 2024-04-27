@@ -1,15 +1,9 @@
-import { FC, useState, useContext } from "react";
-import type { MenuProps } from "antd";
+import { FC, useContext } from "react";
 import { Select } from "antd";
 
 import { UserContext } from "../App";
 
-interface props{
-  accounts:object[],
-  getTransactions:Function,
-  setTransactions:Function,
-  setSelectedAccount:Function
-}
+
 
 type account = {
   bank_account_id: number
@@ -17,12 +11,16 @@ type account = {
   account_number:string
 }
 
+interface props{
+  accounts:object[];
+  selectedAccount: number;
+  setSelectedAccount:Function;
+}
 const AccountDropDown:FC<props> = (props) => {
   const accounts = props.accounts as account[];
-  const {getTransactions, setTransactions, setSelectedAccount} = props;
-  const { userID } = useContext(UserContext);
+  const { selectedAccount, setSelectedAccount } = props;
 
-  const options:object[] = [];
+  const options:{value:number, label: string}[] = [];
 
   accounts.forEach(({bank_account_id, name, account_number}) => {
     const concat = `${name}: ${account_number}`;
@@ -34,17 +32,18 @@ const AccountDropDown:FC<props> = (props) => {
     options.push(option);
   });
 
+  console.log("Account select options:", options);
+
   return (
-        <Select
-            defaultValue = {options[0]}
-            options = {options}
-            onChange = {(value) => {
-              console.log(value);
-              setSelectedAccount(value);
-              getTransactions(setTransactions, userID, value)
-            }}
-        />
-    )
+    <Select
+      value = {options[0] ? selectedAccount : "No Accounts"} //Pass in as defaultValue only works on initial render. Current selection gets passed back in from parent to keep this working right.
+      options = {options}
+      onChange = {(value) => {
+        console.log("Selected account change", value);
+        setSelectedAccount(value);
+      }}
+    />
+  )
 };
 
 export default AccountDropDown;

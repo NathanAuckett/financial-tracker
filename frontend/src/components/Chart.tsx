@@ -1,4 +1,4 @@
-import { LineChart, Line, Tooltip, XAxis, YAxis, Legend} from "recharts";
+import { LineChart, Line, Tooltip, XAxis, YAxis, Legend, ResponsiveContainer} from "recharts";
 import { FC } from "react";
 
 interface props {
@@ -9,13 +9,15 @@ const Chart:FC<props> = (props) => {
     const {data} = props;
 
     return (
-        <LineChart width={1500} height={400} data={data}>
-            <Line dataKey="balance"/>
-            <XAxis dataKey="transaction_date"/>
-            <YAxis/>
-            <Tooltip/>
-            <Legend/>
-        </LineChart>
+        <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={data}>
+                <Line dataKey="balance"/>
+                <XAxis dataKey="transaction_date"/>
+                <YAxis/>
+                <Tooltip/>
+                <Legend/>
+            </LineChart>
+        </ResponsiveContainer>
     )
 }
 

@@ -87,33 +87,31 @@ const DataView:FC<props> = (props) => {
 
     return (
         <>
-            <Layout>
-                <Sider style={{color: "white"}}>
+          <Layout>
+              <Sider style={{padding: 10}} width="max-content">
+                  <AccountDropDown
+                    accounts={accounts}
+                    selectedAccount={selectedAccount}
+                    //getTransactions={getTransactions}
+                    //setTransactions={setTransactions}
+                    setSelectedAccount={setSelectedAccount}
+                  />
+              </Sider>
 
-                    <AccountDropDown
-                      accounts={accounts}
-                      getTransactions={getTransactions}
-                      setTransactions={setTransactions}
-                      setSelectedAccount={setSelectedAccount}
-                    />
+              <Content>
+                  <Chart data={transactions}/>
+              </Content>
 
-                </Sider>
+              <Sider style={{padding: 10, color: "white"}}>
+                  Right sider
+              </Sider>
+          </Layout>
 
-                <Content>
-                    <Chart data={transactions}/>
-                </Content>
-
-                <Sider style={{color: "white"}}>
-                    Right sider
-                </Sider>
-            </Layout>
-
-            <div className='TableContainer'>
-                <TransactionTable data={transactions}/>
-            </div>
+          <div className='TableContainer'>
+              <TransactionTable data={transactions}/>
+          </div>
         </>
     )
 }
-
 
 export default DataView;

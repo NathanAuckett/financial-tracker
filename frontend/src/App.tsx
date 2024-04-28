@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 
 //Pages
@@ -12,10 +12,11 @@ import CSVDictionaries from './pages/CSVDictionaries';
 
 import axios from 'axios';
 
-import { Layout} from 'antd';
+import { Layout, Menu } from 'antd';
+import { stringify } from 'querystring';
 const {Header} = Layout;
 
-interface UserContextType {
+type UserContextType = {
   userID?: number,
   setUserID?: Function
 }
@@ -42,28 +43,82 @@ async function getAccounts(accountsSetter:Function, user_id = 1){
 function App() {
   const [userID, setUserID] = useState(1);
   const [accounts, setAccounts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getAccounts(setAccounts, userID);
   }, [userID]);
 
+  const navRoutes = [
+    {
+      key: 0,
+      label: "Transactions",
+      path: "/",
+      component: <DataView accounts = {accounts}/>
+    },
+    {
+      key: 1,
+      label: "CSV Dictionaries",
+      path: "/csv-dictionaries",
+      component: <CSVDictionaries/>
+    },
+    {
+      key: 2,
+      label: "Accounts",
+      path: "/accounts",
+      component: <Accounts accounts = {accounts}/>
+    },
+    {
+      key: 3,
+      label: "Add Transactions",
+      path: "/add-transactions",
+      component: <AddTransactions/>
+    },
+    {
+      key: 4,
+      label: "Categories",
+      path: "/categories",
+      component: <Categories/>
+    },
+    {
+      key: 5,
+      label: "Patterns",
+      path: "/patterns",
+      component: <Patterns/>
+    },
+  ];
+
+  function navHandleClick(target:{key:string}) {
+    console.log(target);
+    const route = navRoutes.find((route) => {
+      return route.key.toString() === target.key
+    });
+
+    if (route){
+      navigate(route.path);
+    }
+  }
+
   return (
     <div className="App">
       <Layout>
-        <Header style={{color: "white"}}>
-          Financial Tracker
+        <Header style={{display: "flex", color: "white", alignItems: "center", justifyContent: "center"}}>
+          <span style={{marginRight: 50}}>Financial Tracker</span>
+          <Menu
+            mode='horizontal'
+            items={navRoutes}
+            onClick={navHandleClick}
+            defaultSelectedKeys={["0"]}
+          />
         </Header>
         
         <UserContext.Provider value={{userID, setUserID}}>
           <Routes>
-
-            <Route path="/" element={<DataView accounts={accounts} />} />
-            <Route path="/accounts" element={<Accounts accounts={accounts} />} />
-            <Route path="/add-transactions" element={<AddTransactions/>} />
-            <Route path="/categories" element={<Categories/>} />
-            <Route path="/patterns" element={<Patterns/>} />
-            <Route path="/csv-dictionaries" element={<CSVDictionaries/>} />
-
+            {
+              navRoutes.map((route) => {
+                return <Route path = {route.path} element = {route.component} />
+              })
+            }
           </Routes>
         </UserContext.Provider>
       </Layout>

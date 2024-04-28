@@ -11,4 +11,6 @@ router.get("/", (req, res) => {
 
 router.get("/get_categories", controller.getCategories);
 
+router.delete("/delete_category", controller.deleteCategory);
+
 module.exports = router;

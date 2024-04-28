@@ -1,50 +1,14 @@
-import { FC, useEffect, useState, useContext } from 'react';
+import { FC, useEffect, useState, useContext, ReactNode } from 'react';
 import { Card, Col, Row, Button, Form, Input, Table, Flex, Layout} from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
 import { UserContext } from "../App";
 
-
-async function getCategories(categorySetter:Function, user_id = 1) {
-    await axios.get('http://localhost:3000/categories/get_categories', {
-        params:{
-            user_id: user_id,
-            columns: JSON.stringify(["category_id", "name"])
-        }
-    })
-    .then((response) => {
-        const categories = response.data.categories;
-
-        console.log(categories);
-        categorySetter(categories);
-    })
-    .catch((error) => {
-        console.log(error);
-    });
-}
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 
-const columns = [
-    {
-        title: 'ID',
-        dataIndex: 'category_id',
-        key: 'category_id',
-        align: 'center' as const
-    },
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        align: 'center' as const
-    }
-];
-
-interface props {
-    
-}
-
-const Categories:FC<props> = (props) => {
+const Categories:FC<{}> = (props) => {
     const { userID } = useContext(UserContext);
     const [categories, setCategories] = useState([]);
 
@@ -60,7 +24,24 @@ const Categories:FC<props> = (props) => {
         })
         .then((response) => {
             console.log(response.data);
-            getCategories(setCategories, userID);
+            getCategories();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
+    async function getCategories() {
+        await axios.get('http://localhost:3000/categories/get_categories', {
+            params:{
+                user_id: userID,
+                columns: JSON.stringify(["category_id", "name"])
+            }
+        })
+        .then((response) => {
+            const categories = response.data.categories;
+            console.log(categories);
+            setCategories(categories);
         })
         .catch((error) => {
             console.log(error);
@@ -68,9 +49,60 @@ const Categories:FC<props> = (props) => {
     }
 
     useEffect(() => {
-        getCategories(setCategories, userID);
-    }, [userID]);
+        getCategories();
+    }, []);
 
+    const NameField:FC<{category_id:number, name:string}> = (props) => {
+        const { category_id, name } = props;
+    
+        function handleEdit(){
+            console.log("Edit", category_id);
+        }
+    
+        async function handleDelete(){
+            console.log("Delete", category_id);
+            await axios.delete("http://localhost:3000/categories/delete_category", {
+                params: {
+                    user_id: userID,
+                    category_id: category_id
+                }
+            })
+            .then(() => {
+                getCategories();
+            });
+        }
+    
+        return (
+            <>
+                <p style={{display:"inline", marginRight: 5}}>{name}</p>
+                <Button type='link' onClick={()=>{handleEdit()}}>
+                    <EditOutlined/>
+                </Button>
+                <Button type='text' danger onClick={()=>{handleDelete()}}>
+                    <DeleteOutlined/>
+                </Button>
+            </>
+        )
+    }
+    const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'category_id',
+            key: 'category_id',
+            align: 'center' as const
+        },
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            align: 'center' as const,
+            render: (text:string, {category_id, name}:{category_id:number, name:string}) => {
+                return (
+                    <NameField category_id = {category_id} name = {name}/>
+                )
+            }
+        }
+    ];
 
     return <>
         <Row gutter={200} justify={"center"}>

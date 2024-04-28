@@ -15,10 +15,10 @@ User.hasMany(PatternGroup, {foreignKey: "user_id"});
 User.hasMany(Category, {foreignKey: "user_id"});
 User.hasMany(CSVDictionary, {foreignKey: "user_id"});
 
-CSVDictionary.belongsTo(User, {foreignKey: "user_id"});
+CSVDictionary.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
 
-Transaction.belongsTo(User, {foreignKey: "user_id"});
-Transaction.belongsTo(BankAccount, {foreignKey: "bank_account_id"});
+Transaction.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
+Transaction.belongsTo(BankAccount, {foreignKey: "bank_account_id", onDelete: "CASCADE"});
 Transaction.belongsToMany(Category, {
     through: TransactionCategory,
     throughAssociations: {
@@ -28,11 +28,12 @@ Transaction.belongsToMany(Category, {
         toTarget: 'category_id'
     },
     foreignKey: "transaction_id",
-    otherKey: 'category_id'
+    otherKey: 'category_id',
+    onDelete: "CASCADE"
 });
 
-BankAccount.belongsTo(User, {foreignKey: "user_id"});
-BankAccount.hasMany(Transaction, {foreignKey: "bank_account_id"});
+BankAccount.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
+BankAccount.hasMany(Transaction, {foreignKey: "bank_account_id", onDelete: "CASCADE"});
 
 Category.belongsTo(User, {foreignKey: "user_id"});
 //Category.hasMany(TransactionCategory, {foreignKey: "category_id"});
@@ -45,15 +46,16 @@ Category.belongsToMany(Transaction, {
         toTarget: 'transaction_id'
     },
     foreignKey: "category_id",
-    otherKey: 'transaction_id'
+    otherKey: 'transaction_id',
+    onDelete: "CASCADE"
 });
-Category.hasMany(PatternGroup, {foreignKey: "category_id"});
+Category.hasMany(PatternGroup, {foreignKey: "category_id", onDelete: "CASCADE"});
 
-Pattern.belongsTo(PatternGroup, {foreignKey: "pattern_group_id"});
+Pattern.belongsTo(PatternGroup, {foreignKey: "pattern_group_id", onDelete: "CASCADE"});
 
-PatternGroup.belongsTo(User, {foreignKey: "user_id"});
-PatternGroup.hasMany(Pattern, {foreignKey: "pattern_group_id"});
-PatternGroup.belongsTo(Category, {foreignKey: "category_id"});
+PatternGroup.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
+PatternGroup.hasMany(Pattern, {foreignKey: "pattern_group_id", onDelete: "CASCADE"});
+PatternGroup.belongsTo(Category, {foreignKey: "category_id", onDelete: "CASCADE"});
 
 
 export {};

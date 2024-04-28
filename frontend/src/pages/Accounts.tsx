@@ -3,13 +3,15 @@ import { Card, Row, Button, Form, Input, Table } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { UserContext } from "../App";
+import { UserContext, AccountsContext } from '../context';
 
-export type AccountType = {
-    bank_account_id:number,
-    name:string,
-    account_number:string
-}
+import type { Account } from "../types";
+
+// export type AccountType = {
+//     bank_account_id:number,
+//     name:string,
+//     account_number:string
+// }
 
 const columns = [
     {
@@ -28,11 +30,12 @@ const columns = [
 
 
 interface props {
-    accounts:AccountType[]
+    accounts:Account[]
 }
 const Accounts:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
-    const { accounts } = props;
+    const { accounts, setAccounts } = useContext(AccountsContext);
+    //const { accounts } = props;
     
     type FieldType = {
         account_number: string;

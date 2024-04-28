@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { Pattern, PatternType} from "../components/Pattern"
 
-import { UserContext } from "../App";
+import { UserContext } from '../context';
 
 export type PatternGroupType = {
     pattern_group_id?: number,

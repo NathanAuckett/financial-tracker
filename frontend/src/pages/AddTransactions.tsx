@@ -3,7 +3,7 @@ import { Upload, Form, Button, Input} from 'antd';
 import type { FormProps } from "antd";
 import axios from 'axios';
 
-import { UserContext } from "../App";
+import { UserContext } from '../context';
 
 
 interface props {

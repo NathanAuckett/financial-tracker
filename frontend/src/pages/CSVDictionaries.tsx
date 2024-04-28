@@ -3,8 +3,7 @@ import { Row, Card, Form, Input, Button, Table } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { UserContext } from "../App";
-import { ArrayTypeNode } from "typescript";
+import { UserContext } from '../context';
 
 const columns = [
     {

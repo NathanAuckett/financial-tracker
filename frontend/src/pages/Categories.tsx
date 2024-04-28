@@ -1,12 +1,13 @@
-import { FC, useEffect, useState, useContext, ReactNode } from 'react';
-import { Card, Col, Row, Button, Form, Input, Table, Flex, Layout} from "antd";
-import type { FormProps, InputProps } from "antd";
+import { FC, useEffect, useState, useContext } from 'react';
+import { Card, Row, Button, Form, Input, Table} from "antd";
+import type { FormProps } from "antd";
 import axios from "axios";
 
-import { UserContext } from "../App";
+import { UserContext } from '../context';
 
 import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
+import FieldControls from '../components/FieldControls';
 
 const Categories:FC<{}> = () => {
     const { userID } = useContext(UserContext);
@@ -90,33 +91,23 @@ const Categories:FC<{}> = () => {
         return (
             <>
                 {editing ?
-                    <>
-                        <Input 
-                            name='name'
-                            defaultValue={name}
-                            style={{display: "inline", width:"max-content"}}
-                            onChange={(element) => {
-                                setNewName(element.target.value);
-                            }}
-                        />
-                        <Button type='link' onClick={()=>{handleEdit()}}>
-                            <CheckCircleOutlined/>
-                        </Button>
-                        <Button type='text' danger onClick={()=>{setEditing(false)}}>
-                            <StopOutlined/>
-                        </Button>
-                    </>
+                    <Input 
+                        name='name'
+                        defaultValue={name}
+                        style={{display: "inline", width:"max-content"}}
+                        onChange={(element) => {
+                            setNewName(element.target.value);
+                        }}
+                    />
                 :
-                    <>
-                        <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                        <Button type='link' onClick={()=>{setEditing(true)}}>
-                            <EditOutlined/>
-                        </Button>
-                        <Button type='text' danger onClick={()=>{handleDelete()}}>
-                            <DeleteOutlined/>
-                        </Button>
-                    </>
+                    <p style={{display:"inline", marginRight: 5}}>{name}</p>
                 }
+                <FieldControls
+                    editing={editing}
+                    setEditing={setEditing}
+                    handleEdit={handleEdit}
+                    handleDelete={handleDelete}
+                />
             </>
         )
     }

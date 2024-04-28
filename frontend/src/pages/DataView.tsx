@@ -6,9 +6,10 @@ import AccountDropDown from '../components/AccountDropDown';
 
 import axios from 'axios';
 
-import { UserContext } from "../App";
+import { UserContext } from '../context';
 
 import { Layout } from 'antd';
+import { Account } from '../types';
 const {Content, Sider} = Layout;
 
 
@@ -71,7 +72,7 @@ async function getTransactions(transactionsSetter:Function, user_id = 1, bank_ac
 }
 
 interface props {
-    accounts:object[]
+    accounts:Account[]
 }
 
 const DataView:FC<props> = (props) => {

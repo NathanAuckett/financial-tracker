@@ -1,9 +1,5 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import { Select } from "antd";
-
-import { UserContext } from "../App";
-
-
 
 type account = {
   bank_account_id: number

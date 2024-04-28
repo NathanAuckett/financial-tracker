@@ -12,15 +12,11 @@ import CSVDictionaries from './pages/CSVDictionaries';
 
 import axios from 'axios';
 
-import { Layout, Menu } from 'antd';
-import { stringify } from 'querystring';
-const {Header} = Layout;
+import { UserContext, AccountsContext } from './context';
+import { Account } from './types';
 
-type UserContextType = {
-  userID?: number,
-  setUserID?: Function
-}
-export const UserContext = React.createContext<UserContextType>({});
+import { Layout, Menu } from 'antd';
+const {Header} = Layout;
 
 async function getAccounts(accountsSetter:Function, user_id = 1){
   await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts', { //body gets ignored on get requests
@@ -42,7 +38,7 @@ async function getAccounts(accountsSetter:Function, user_id = 1){
 
 function App() {
   const [userID, setUserID] = useState(1);
-  const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -113,6 +109,7 @@ function App() {
         </Header>
         
         <UserContext.Provider value={{userID, setUserID}}>
+        <AccountsContext.Provider value={{accounts, setAccounts}}>
           <Routes>
             {
               navRoutes.map((route) => {
@@ -120,6 +117,7 @@ function App() {
               })
             }
           </Routes>
+        </AccountsContext.Provider>
         </UserContext.Provider>
       </Layout>
     </div>

@@ -42,6 +42,7 @@ export const PatternGroup:FC<props> = (props) => {
         })
         .then((response) => {
             console.log(response.data);
+            setShowForm(false);
             getPatternGroups();
         })
         .catch((error) => {
@@ -50,7 +51,7 @@ export const PatternGroup:FC<props> = (props) => {
     }
 
     return (
-        <Flex vertical style={{borderStyle: 'solid'}}>
+        <Flex vertical style={{borderStyle: 'solid', width:400}}>
             <h3>Group: {name} ---{">"} Category: {category_id}</h3>
 
             {/* Show patterns */}
@@ -62,14 +63,14 @@ export const PatternGroup:FC<props> = (props) => {
                 <>
                 <Button onClick={() => {setShowForm(false)}}>Cancel</Button>
                 <Form
-                name="pattern"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                initialValues={{ match_array: true }}
-                onFinish={handleSubmit}
-                // onFinishFailed={onFinishFailed}
-                autoComplete="off"
+                    name="pattern"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 600 }}
+                    initialValues={{ match_array: true }}
+                    onFinish={handleSubmit}
+                    // onFinishFailed={onFinishFailed}
+                    autoComplete="off"
                 >
                     
                     <Form.Item

@@ -8,7 +8,7 @@ import { UserContext } from "../App";
 import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
 
-const Categories:FC<{}> = (props) => {
+const Categories:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [categories, setCategories] = useState([]);
 

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useContext } from 'react';
-import { Card, Col, Row, Button, Form, Input, Table, Checkbox } from "antd";
+import { Card, Col, Row, Button, Form, Input, Table, Checkbox, Select } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -7,14 +7,17 @@ import { UserContext } from "../App";
 
 import { PatternGroup, PatternGroupType } from "../components/PatternGroup"
 
-
-interface props {
-    
+type CategorySelectOptionType = {
+    category_id?:number,
+    name?:string,
+    value?:number,
+    label?:string
 }
 
-const Patterns:FC<props> = (props) => {
+const Patterns:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [patternGroups, setPatternGroups] = useState([]);
+    const [categorySelectOptions, setCategorySelectOptions] = useState<CategorySelectOptionType[]>([]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log(values);
@@ -51,8 +54,36 @@ const Patterns:FC<props> = (props) => {
         });
     }
 
+    async function getCategories() {
+        await axios.get('http://localhost:3000/categories/get_categories', {
+            params:{
+                user_id: userID,
+                columns: JSON.stringify(["category_id", "name"])
+            }
+        })
+        .then((response) => {
+            const categories = response.data.categories as CategorySelectOptionType[];
+
+            const options:CategorySelectOptionType[] = [];
+            categories.forEach(({category_id, name}) => {
+                const option = {
+                    value: category_id,
+                    label: name
+                }
+                options.push(option);
+            });
+
+            console.log(options);
+            setCategorySelectOptions(options);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
     useEffect(() => {
         getPatternGroups();
+        getCategories();
     }, []);
 
     return <>
@@ -78,11 +109,13 @@ const Patterns:FC<props> = (props) => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Category ID to match"
+                        label="Category to match"
                         name="category_id"
                         rules={[{ required: true, message: 'Please input the category for this group to match into!' }]}
                     >
-                        <Input />
+                        <Select
+                            options = {categorySelectOptions}
+                        />
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 2, span: 16 }}>

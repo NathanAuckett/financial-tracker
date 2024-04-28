@@ -28,7 +28,7 @@ export const Pattern:FC<PatternType> = (props) => {
     });
 
     return (
-        <Flex vertical style={{borderStyle: 'solid'}}>
+        <Flex vertical style={{borderStyle: 'solid none solid'}}>
         <h3>Pattern: {props.name}</h3>
         <Table
             style = {{width:800, textAlign:"center"}}

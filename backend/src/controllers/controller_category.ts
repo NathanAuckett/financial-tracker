@@ -51,8 +51,7 @@ async function deleteCategory(req:Request, res: Response){
     if (!user_id || !category_id){
         return res.status(400).json({
             message: 'Delete failed! Missing user_id or category_id from request.',
-            user_id,
-            category_id
+            query: req.query
         }); 
     }
 
@@ -75,8 +74,40 @@ async function deleteCategory(req:Request, res: Response){
     });
 }
 
+async function updateCategory(req:Request, res: Response) {
+    const { user_id, category_id, name } = req.body;
+
+    if (!user_id || !category_id || !name){
+        return res.status(400).json({
+            message: 'Delete failed! Missing user_id or category_id from request.',
+            query: req.query
+        }); 
+    }
+
+    await Category.update({ name: name },
+        {
+            where: {
+                user_id: user_id,
+                category_id: category_id
+            }
+        }
+    )
+    .then((response:object[]) => {
+        return res.status(201).json({
+            message: "Update successful!",
+            response
+        }); 
+    })
+    .catch((error:Error) => {
+        return res.status(400).json({
+            error: error.message
+        }); 
+    });
+}
+
 module.exports = {
     createCategory,
     getCategories,
-    deleteCategory
+    deleteCategory,
+    updateCategory
 }

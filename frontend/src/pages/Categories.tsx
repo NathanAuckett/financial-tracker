@@ -1,11 +1,11 @@
 import { FC, useEffect, useState, useContext, ReactNode } from 'react';
 import { Card, Col, Row, Button, Form, Input, Table, Flex, Layout} from "antd";
-import type { FormProps } from "antd";
+import type { FormProps, InputProps } from "antd";
 import axios from "axios";
 
 import { UserContext } from "../App";
 
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
 
 const Categories:FC<{}> = (props) => {
@@ -54,13 +54,25 @@ const Categories:FC<{}> = (props) => {
 
     const NameField:FC<{category_id:number, name:string}> = (props) => {
         const { category_id, name } = props;
+        const [editing, setEditing] = useState(false);
+        const [newName, setNewName] = useState(name);
     
-        function handleEdit(){
-            console.log("Edit", category_id);
+        async function handleEdit(){
+            setEditing(!editing);
+            await axios.patch("http://localhost:3000/categories/update_category", {
+                user_id: userID,
+                category_id: category_id,
+                name: newName
+            })
+            .then(() => {
+                getCategories();
+            })
+            .catch((error:Error) => {
+                console.log(error.message);
+            });
         }
     
         async function handleDelete(){
-            console.log("Delete", category_id);
             await axios.delete("http://localhost:3000/categories/delete_category", {
                 params: {
                     user_id: userID,
@@ -69,21 +81,46 @@ const Categories:FC<{}> = (props) => {
             })
             .then(() => {
                 getCategories();
+            })
+            .catch((error:Error) => {
+                console.log(error.message);
             });
         }
     
         return (
             <>
-                <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                <Button type='link' onClick={()=>{handleEdit()}}>
-                    <EditOutlined/>
-                </Button>
-                <Button type='text' danger onClick={()=>{handleDelete()}}>
-                    <DeleteOutlined/>
-                </Button>
+                {editing ?
+                    <>
+                        <Input 
+                            name='name'
+                            defaultValue={name}
+                            style={{display: "inline", width:"max-content"}}
+                            onChange={(element) => {
+                                setNewName(element.target.value);
+                            }}
+                        />
+                        <Button type='link' onClick={()=>{handleEdit()}}>
+                            <CheckCircleOutlined/>
+                        </Button>
+                        <Button type='text' danger onClick={()=>{setEditing(false)}}>
+                            <StopOutlined/>
+                        </Button>
+                    </>
+                :
+                    <>
+                        <p style={{display:"inline", marginRight: 5}}>{name}</p>
+                        <Button type='link' onClick={()=>{setEditing(true)}}>
+                            <EditOutlined/>
+                        </Button>
+                        <Button type='text' danger onClick={()=>{handleDelete()}}>
+                            <DeleteOutlined/>
+                        </Button>
+                    </>
+                }
             </>
         )
     }
+
     const columns = [
         {
             title: 'ID',

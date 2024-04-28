@@ -13,4 +13,6 @@ router.get("/get_categories", controller.getCategories);
 
 router.delete("/delete_category", controller.deleteCategory);
 
+router.patch("/update_category", controller.updateCategory);
+
 module.exports = router;

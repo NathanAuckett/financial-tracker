@@ -4,14 +4,53 @@ import type { FormProps } from "antd";
 import axios from "axios";
 
 import { UserContext } from '../context';
+import { Category } from '../types';
 
 import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
 import FieldControls from '../components/FieldControls';
 
+type CategoryRow = Category & {
+    editing: boolean;
+    newName: string;
+}
+const CategoryRowDefaults = {
+    editing: false,
+    newName: ""
+}
+
+function findCategoryIndexFromID(categories:CategoryRow[], category_id:number){
+    const index = categories.findIndex((e) => { //spread found element into object
+        return e.category_id === category_id;
+    })
+    return categories[index];
+}
+
 const Categories:FC<{}> = () => {
     const { userID } = useContext(UserContext);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<CategoryRow[]>([]);
+
+    async function getCategories() {
+        await axios.get('http://localhost:3000/categories/get_categories', {
+            params:{
+                user_id: userID,
+                columns: JSON.stringify(["category_id", "name"])
+            }
+        })
+        .then((response) => {
+            const categories = response.data.categories as CategoryRow[];
+
+            categories.forEach((e) => {
+                e.newName = CategoryRowDefaults.newName;
+                e.editing = CategoryRowDefaults.editing;
+            });
+
+            setCategories(categories);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log({
@@ -32,34 +71,9 @@ const Categories:FC<{}> = () => {
         });
     }
 
-    async function getCategories() {
-        await axios.get('http://localhost:3000/categories/get_categories', {
-            params:{
-                user_id: userID,
-                columns: JSON.stringify(["category_id", "name"])
-            }
-        })
-        .then((response) => {
-            const categories = response.data.categories;
-            console.log(categories);
-            setCategories(categories);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
-
-    useEffect(() => {
-        getCategories();
-    }, []);
-
-    const NameField:FC<{category_id:number, name:string}> = (props) => {
-        const { category_id, name } = props;
-        const [editing, setEditing] = useState(false);
-        const [newName, setNewName] = useState(name);
-    
-        async function handleEdit(){
-            setEditing(!editing);
+    async function handleCategoryEdit(category_id:number, oldName:string, newName:string){
+        console.log(oldName, newName);
+        if (oldName != newName){
             await axios.patch("http://localhost:3000/categories/update_category", {
                 user_id: userID,
                 category_id: category_id,
@@ -72,109 +86,131 @@ const Categories:FC<{}> = () => {
                 console.log(error.message);
             });
         }
-    
-        async function handleDelete(){
-            await axios.delete("http://localhost:3000/categories/delete_category", {
-                params: {
-                    user_id: userID,
-                    category_id: category_id
-                }
-            })
-            .then(() => {
-                getCategories();
-            })
-            .catch((error:Error) => {
-                console.log(error.message);
-            });
+        else{
+            findCategoryIndexFromID(categories, category_id).editing = false;
+            setCategories([...categories]);
         }
-    
-        return (
-            <>
-                {editing ?
-                    <Input 
-                        name='name'
-                        defaultValue={name}
-                        style={{display: "inline", width:"max-content"}}
-                        onChange={(element) => {
-                            setNewName(element.target.value);
-                        }}
-                    />
-                :
-                    <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                }
-                <FieldControls
-                    editing={editing}
-                    setEditing={setEditing}
-                    handleEdit={handleEdit}
-                    handleDelete={handleDelete}
-                />
-            </>
-        )
     }
 
+    async function handleCategoryDelete(category_id:number){
+        await axios.delete("http://localhost:3000/categories/delete_category", {
+            params: {
+                user_id: userID,
+                category_id: category_id
+            }
+        })
+        .then(() => {
+            getCategories();
+        })
+        .catch((error:Error) => {
+            console.log(error.message);
+        });
+    }
+
+    useEffect(() => {
+        getCategories();
+    }, []);
+
     const columns = [
-        {
-            title: 'ID',
-            dataIndex: 'category_id',
-            key: 'category_id',
-            align: 'center' as const
-        },
-        {
+       {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            align: 'center' as const,
-            render: (text:string, {category_id, name}:{category_id:number, name:string}) => {
+            align: 'left' as const,
+            render: (text:string, {category_id, name}:{category_id:number, name:string}, index:number) => {
+                const thisCategoryRow = findCategoryIndexFromID(categories, category_id);
+                
                 return (
-                    <NameField category_id = {category_id} name = {name}/>
+                    <>
+                        {thisCategoryRow.editing ?
+                            <Input 
+                                name='name'
+                                defaultValue={name}
+                                style={{display: "inline", width:"max-content"}}
+                                onChange={(element) => {
+                                    thisCategoryRow.newName = element.target.value;
+                                    setCategories([...categories]);
+                                }}
+                            />
+                        :
+                            <p style={{display:"inline", marginRight: 5}}>{name}</p>
+                        }
+                    </>
+                )
+            }
+        },
+        {
+            title: 'Actions',
+            key: "actions",
+            align: 'right' as const,
+            render: (text:string, {category_id, name}:{category_id:number, name:string}, index:number) => {
+                const thisCategoryRow = findCategoryIndexFromID(categories, category_id);
+                const editing = thisCategoryRow?.editing || false; //ensures it defaults to false if editing cannot be found
+
+                return (
+                    <FieldControls
+                        editing = {editing}
+                        setEditing = {() => {
+                            thisCategoryRow.editing = !editing;
+                            if (thisCategoryRow.editing){
+                                thisCategoryRow.newName = thisCategoryRow.name; //set to default on edit start
+                            }
+
+                            setCategories([...categories]);
+                        }}
+                        handleEdit = {() => {handleCategoryEdit(thisCategoryRow.category_id, thisCategoryRow.name, thisCategoryRow.newName);}}
+                        handleDelete = {() => {handleCategoryDelete(thisCategoryRow.category_id);}}
+                    />
                 )
             }
         }
     ];
 
-    return <>
-        <Row gutter={200} justify={"center"}>
-            <Card key={0} title="New Category" style={{width:800}}>
-                <Form
-                    name="category"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={{ remember: true }}
-                    onFinish={handleSubmit}
-                    // onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                
-                    <Form.Item
-                        label="Name"
-                        name="name"
-                        rules={[{ required: true, message: 'Please input the category name!' }]}
+    return (
+        <>
+            <Row gutter={200} justify={"center"}>
+                <Card key={0} title="New Category" style={{width:800}}>
+                    <Form
+                        name="category"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                        style={{ maxWidth: 600 }}
+                        initialValues={{ remember: true }}
+                        onFinish={handleSubmit}
+                        // onFinishFailed={onFinishFailed}
+                        autoComplete="off"
                     >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
                     
-                </Form>
-            </Card>
-        </Row>
-        <Row gutter={16} justify={"center"}>
-            <h2>Categories</h2>
-        </Row>
-        <Row gutter={16} justify={"center"}>
-            <Table
-                style={{width:800, textAlign:"center"}}
-                dataSource={categories}
-                columns={columns}
-                pagination={false}
-            />
-        </Row>
-    </>
+                        <Form.Item
+                            label="Name"
+                            name="name"
+                            rules={[{ required: true, message: 'Please input the category name!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                        </Form.Item>
+                        
+                    </Form>
+                </Card>
+            </Row>
+            <Row gutter={16} justify={"center"}>
+                <h2>Categories</h2>
+            </Row>
+            <Row gutter={16} justify={"center"}>
+                <Table
+                    style={{width:800, textAlign:"center"}}
+                    dataSource={categories}
+                    columns={columns}
+                    pagination={false}
+                />
+            </Row>
+        </>
+    )
 }
 
 export default Categories;

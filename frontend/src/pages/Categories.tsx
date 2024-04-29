@@ -3,10 +3,10 @@ import { Card, Row, Button, Form, Input, Table} from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
+import { getCategories } from '../helper-functions/getCategories';
+
 import { UserContext } from '../context';
 import { Category } from '../types';
-
-import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
 import FieldControls from '../components/FieldControls';
 
@@ -30,27 +30,22 @@ const Categories:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [categories, setCategories] = useState<CategoryRow[]>([]);
 
-    async function getCategories() {
-        await axios.get('http://localhost:3000/categories/get_categories', {
-            params:{
-                user_id: userID,
-                columns: JSON.stringify(["category_id", "name"])
-            }
-        })
-        .then((response) => {
-            const categories = response.data.categories as CategoryRow[];
-
+    async function fetchCategories() {
+        const categories = await getCategories(userID as number) as CategoryRow[];
+        
+        if (categories){
             categories.forEach((e) => {
                 e.newName = CategoryRowDefaults.newName;
                 e.editing = CategoryRowDefaults.editing;
             });
 
             setCategories(categories);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+        }
     }
+
+    useEffect(() => {
+        fetchCategories();
+    },[]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log({
@@ -64,7 +59,7 @@ const Categories:FC<{}> = () => {
         })
         .then((response) => {
             console.log(response.data);
-            getCategories();
+            fetchCategories();
         })
         .catch((error) => {
             console.log(error);
@@ -72,7 +67,6 @@ const Categories:FC<{}> = () => {
     }
 
     async function handleCategoryEdit(category_id:number, oldName:string, newName:string){
-        console.log(oldName, newName);
         if (oldName != newName){
             await axios.patch("http://localhost:3000/categories/update_category", {
                 user_id: userID,
@@ -80,7 +74,7 @@ const Categories:FC<{}> = () => {
                 name: newName
             })
             .then(() => {
-                getCategories();
+                fetchCategories();
             })
             .catch((error:Error) => {
                 console.log(error.message);
@@ -100,16 +94,12 @@ const Categories:FC<{}> = () => {
             }
         })
         .then(() => {
-            getCategories();
+            fetchCategories();
         })
         .catch((error:Error) => {
             console.log(error.message);
         });
     }
-
-    useEffect(() => {
-        getCategories();
-    }, []);
 
     const columns = [
        {

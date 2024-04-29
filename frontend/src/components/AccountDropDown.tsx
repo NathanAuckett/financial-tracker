@@ -1,32 +1,31 @@
 import { FC } from "react";
 import { Select } from "antd";
+import { Account } from "../types";
 
-type account = {
-  bank_account_id: number
-  name:string,
-  account_number:string
-}
+
 
 interface props{
-  accounts:object[];
-  selectedAccount: number;
+  accounts:Account[] | undefined;
+  selectedAccount: number | null;
   setSelectedAccount:Function;
 }
 const AccountDropDown:FC<props> = (props) => {
-  const accounts = props.accounts as account[];
+  const accounts = props.accounts;
   const { selectedAccount, setSelectedAccount } = props;
 
   const options:{value:number, label: string}[] = [];
 
-  accounts.forEach(({bank_account_id, name, account_number}) => {
-    const concat = `${name}: ${account_number}`;
+  if (accounts){
+    accounts.forEach(({bank_account_id, name, account_number}) => {
+      const concat = `${name}: ${account_number}`;
 
-    const option = {
-      value: bank_account_id,
-      label: concat
-    }
-    options.push(option);
-  });
+      const option = {
+        value: bank_account_id,
+        label: concat
+      }
+      options.push(option);
+    });
+  }
 
   console.log("Account select options:", options);
 

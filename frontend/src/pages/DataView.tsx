@@ -6,7 +6,7 @@ import AccountDropDown from '../components/AccountDropDown';
 
 import axios from 'axios';
 
-import { UserContext } from '../context';
+import { AccountsContext, UserContext } from '../context';
 
 import { Layout } from 'antd';
 import { Account } from '../types';
@@ -72,19 +72,28 @@ async function getTransactions(transactionsSetter:Function, user_id = 1, bank_ac
 }
 
 interface props {
-    accounts:Account[]
+    //accounts:Account[]
 }
-
 const DataView:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
+    const { accounts } = useContext(AccountsContext);
     const [transactions, setTransactions] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState(1);
 
-    const { accounts } = props;
+    //const { accounts } = props;
 
     useEffect(() => {
+        if (accounts && accounts.length > 0){
+          const found = accounts.find((e) => {
+            return e.bank_account_id == selectedAccount
+          });
+
+          if (!found){
+            setSelectedAccount(accounts[0].bank_account_id);
+          }
+        }
         getTransactions(setTransactions, userID, selectedAccount);
-    }, [userID, selectedAccount]);
+    }, [userID, selectedAccount, accounts]);
 
     return (
         <>

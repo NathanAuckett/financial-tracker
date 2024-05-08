@@ -31,64 +31,6 @@ const Accounts:FC = (props) => {
         });
     }
 
-    const NameField:FC<{category_id:number, name:string}> = (props) => {
-        const { category_id, name } = props;
-        const [editing, setEditing] = useState(false);
-        const [newName, setNewName] = useState(name);
-    
-        async function handleEdit(){
-            setEditing(!editing);
-            await axios.patch("http://localhost:3000/categories/update_category", {
-                user_id: userID,
-                category_id: category_id,
-                name: newName
-            })
-            .then(() => {
-                getAccounts();
-            })
-            .catch((error:Error) => {
-                console.log(error.message);
-            });
-        }
-    
-        async function handleDelete(){
-            await axios.delete("http://localhost:3000/categories/delete_category", {
-                params: {
-                    user_id: userID,
-                    category_id: category_id
-                }
-            })
-            .then(() => {
-                getAccounts();
-            })
-            .catch((error:Error) => {
-                console.log(error.message);
-            });
-        }
-    
-        return (
-            <>
-                {editing ?
-                    <Input 
-                        name='name'
-                        defaultValue={name}
-                        style={{display: "inline", width:"max-content"}}
-                        onChange={(element) => {
-                            setNewName(element.target.value);
-                        }}
-                    />
-                :
-                    <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                }
-                <FieldControls
-                    editing={editing}
-                    setEditing={setEditing}
-                    handleEdit={handleEdit}
-                    handleDelete={handleDelete}
-                />
-            </>
-        )
-    }
 
     const columns = [
         {
@@ -102,6 +44,9 @@ const Accounts:FC = (props) => {
             dataIndex: 'name',
             key: 'name',
             align: 'center' as const
+        },
+        {
+            title: ''
         }
     ];
 

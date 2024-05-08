@@ -5,7 +5,7 @@ export type Category = {
 }
 
 export type Account = {
-    bank_account_id?: number
+    bank_account_id: number
     name?:string,
     account_number?:string
 }

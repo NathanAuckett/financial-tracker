@@ -52,7 +52,7 @@ function App() {
       key: 0,
       label: "Transactions",
       path: "/",
-      component: <DataView accounts = {accounts}/>
+      component: <DataView/>
     },
     {
       key: 1,

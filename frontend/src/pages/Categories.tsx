@@ -5,8 +5,6 @@ import axios from "axios";
 
 import { UserContext } from '../context';
 
-import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
-
 import FieldControls from '../components/FieldControls';
 
 const Categories:FC<{}> = () => {

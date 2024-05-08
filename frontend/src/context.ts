@@ -8,15 +8,19 @@ type UserContextType = {
 }
 export const UserContext = createContext<UserContextType>({});
 
-
 type CategoriesContextType = {
     categories?: Category[],
     setCategories?: Function
 }
 export const CategoriesContext = createContext<CategoriesContextType>({});
 
-type AccountsContextType = {
-    accounts?: Account[],
-    setAccounts?: Function
+export type AccountsContextType = {
+    accounts: Account[],
+    setAccounts: Function
+    getAccounts: Function
 }
-export const AccountsContext = createContext<AccountsContextType>({});
+export const AccountsContext = createContext<AccountsContextType>({
+    accounts:[],
+    setAccounts: () => {console.log("getAccounts function not set")},
+    getAccounts: () => {console.log("setAccounts function not set")}
+});

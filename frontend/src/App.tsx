@@ -18,22 +18,6 @@ import { Account } from './types';
 import { Layout, Menu } from 'antd';
 const {Header} = Layout;
 
-async function getAccounts(accountsSetter:Function, user_id = 1){
-  await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts', { //body gets ignored on get requests
-    params: {
-      user_id: user_id,
-      columns: JSON.stringify(["bank_account_id", "account_number", "name"])
-    }
-  })
-  .then((response) => {
-    const accounts = response.data.accounts;
-    console.log("Fetched Accounts", accounts);
-    accountsSetter(accounts);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-}
 
 
 function App() {
@@ -42,8 +26,26 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAccounts(setAccounts, userID);
+    getAccounts(userID);
   }, [userID]);
+
+  async function getAccounts(user_id = 1){
+    await axios.get('http://localhost:3000/bank_accounts/get_bank_accounts', { //body gets ignored on get requests
+      params: {
+        user_id: user_id,
+        columns: JSON.stringify(["bank_account_id", "account_number", "name"])
+      }
+    })
+    .then((response) => {
+      const accounts = response.data.accounts;
+      console.log("Fetched Accounts", accounts);
+      setAccounts(accounts);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+  
 
   const navRoutes = [
     {
@@ -62,7 +64,7 @@ function App() {
       key: 2,
       label: "Accounts",
       path: "/accounts",
-      component: <Accounts accounts = {accounts}/>
+      component: <Accounts/>
     },
     {
       key: 3,
@@ -109,7 +111,7 @@ function App() {
         </Header>
         
         <UserContext.Provider value={{userID, setUserID}}>
-        <AccountsContext.Provider value={{accounts, setAccounts}}>
+        <AccountsContext.Provider value={{accounts, setAccounts, getAccounts}}>
           <Routes>
             {
               navRoutes.map((route) => {

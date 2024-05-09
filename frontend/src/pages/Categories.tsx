@@ -6,7 +6,7 @@ import axios from "axios";
 import { getCategories } from '../helper-functions/getCategories';
 
 import { UserContext } from '../context';
-import { Category } from '../types';
+import type { Category } from '../types';
 
 import FieldControls from '../components/FieldControls';
 
@@ -48,11 +48,6 @@ const Categories:FC<{}> = () => {
     },[]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
-        console.log({
-            user_id: userID,
-            ...values
-        });
-        
         await axios.post('http://localhost:3000/categories/category', {
             user_id: userID,
             ...values
@@ -67,7 +62,7 @@ const Categories:FC<{}> = () => {
     }
 
     async function handleCategoryEdit(category_id:number, oldName:string, newName:string){
-        if (oldName != newName){
+        if (oldName !== newName){
             await axios.patch("http://localhost:3000/categories/update_category", {
                 user_id: userID,
                 category_id: category_id,
@@ -107,9 +102,8 @@ const Categories:FC<{}> = () => {
             dataIndex: 'name',
             key: 'name',
             align: 'left' as const,
-            render: (text:string, {category_id, name}:{category_id:number, name:string}, index:number) => {
+            render: (text:string, {category_id, name}:Category, index:number) => {
                 const thisCategoryRow = findCategoryIndexFromID(categories, category_id);
-                
                 return (
                     <>
                         {thisCategoryRow.editing ?
@@ -133,23 +127,21 @@ const Categories:FC<{}> = () => {
             title: 'Actions',
             key: "actions",
             align: 'right' as const,
-            render: (text:string, {category_id, name}:{category_id:number, name:string}, index:number) => {
-                const thisCategoryRow = findCategoryIndexFromID(categories, category_id);
-                const editing = thisCategoryRow?.editing || false; //ensures it defaults to false if editing cannot be found
-
+            render: (text:string, {category_id}:Category, index:number) => {
+                const thisRow = findCategoryIndexFromID(categories, category_id);
+                const editing = thisRow?.editing || false; //ensures it defaults to false if editing cannot be found
                 return (
                     <FieldControls
                         editing = {editing}
                         setEditing = {() => {
-                            thisCategoryRow.editing = !editing;
-                            if (thisCategoryRow.editing){
-                                thisCategoryRow.newName = thisCategoryRow.name; //set to default on edit start
+                            thisRow.editing = !editing;
+                            if (thisRow.editing){
+                                thisRow.newName = thisRow.name; //set to default on edit start
                             }
-
                             setCategories([...categories]);
                         }}
-                        handleEdit = {() => {handleCategoryEdit(thisCategoryRow.category_id, thisCategoryRow.name, thisCategoryRow.newName);}}
-                        handleDelete = {() => {handleCategoryDelete(thisCategoryRow.category_id);}}
+                        handleEdit = {() => {handleCategoryEdit(thisRow.category_id, thisRow.name, thisRow.newName);}}
+                        handleDelete = {() => {handleCategoryDelete(thisRow.category_id);}}
                     />
                 )
             }

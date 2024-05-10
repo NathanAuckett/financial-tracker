@@ -11,10 +11,12 @@ import FieldControls from '../components/FieldControls';
 type AccountRow = Account & {
     editing: boolean;
     newName: string;
+    newAccountNumber: string;
 }
 const AccountRowDefaults = {
     editing: false,
-    newName: ""
+    newName: "",
+    newAccountNumber: ""
 }
 type FieldType = {
     account_number: string;
@@ -35,6 +37,7 @@ const Accounts:FC = () => {
     useEffect(() => {
         accounts.forEach((e) => {
             e.newName = AccountRowDefaults.newName;
+            e.newAccountNumber = AccountRowDefaults.newAccountNumber;
             e.editing = AccountRowDefaults.editing;
         });
         console.log("Effect:", accounts);
@@ -56,19 +59,20 @@ const Accounts:FC = () => {
     }
 
 
-    async function handleAccountEdit(bank_account_id:number, oldName:string, newName:string){
-        if (oldName !== newName){
-            // await axios.patch("http://localhost:3000/categories/update_category", {
-            //     user_id: userID,
-            //     category_id: category_id,
-            //     name: newName
-            // })
-            // .then(() => {
-            //     fetchCategories();
-            // })
-            // .catch((error:Error) => {
-            //     console.log(error.message);
-            // });
+    async function handleAccountEdit(bank_account_id:number, oldName:string, newName:string, oldAccountNumber:string, newAccountNumber:string){
+        if (oldName !== newName || oldAccountNumber !== newAccountNumber){
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}bank_accounts/update_bank_account`, {
+                user_id: userID,
+                bank_account_id: bank_account_id,
+                name: newName,
+                account_number: newAccountNumber
+            })
+            .then(() => {
+                getAccounts();
+            })
+            .catch((error:Error) => {
+                console.log(error.message);
+            });
         }
         else{
             findAccountIndexFromID(accounts, bank_account_id).editing = false;
@@ -77,18 +81,18 @@ const Accounts:FC = () => {
     }
 
     async function handleAccountDelete(bank_account_id:number){
-        // await axios.delete("http://localhost:3000/categories/delete_category", {
-        //     params: {
-        //         user_id: userID,
-        //         category_id: category_id
-        //     }
-        // })
-        // .then(() => {
-        //     fetchCategories();
-        // })
-        // .catch((error:Error) => {
-        //     console.log(error.message);
-        // });
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}bank_accounts/delete_bank_account`, {
+            params: {
+                user_id: userID,
+                bank_account_id: bank_account_id
+            }
+        })
+        .then(() => {
+            getAccounts();
+        })
+        .catch((error:Error) => {
+            console.log(error.message);
+        });
     }
 
     const columns = [
@@ -133,7 +137,7 @@ const Accounts:FC = () => {
                                 defaultValue={account_number}
                                 style={{display: "inline", width:"max-content"}}
                                 onChange={(element) => {
-                                    thisRow.account_number = element.target.value;
+                                    thisRow.newAccountNumber = element.target.value;
                                     setAccounts([...accounts]);
                                 }}
                             />
@@ -156,13 +160,13 @@ const Accounts:FC = () => {
                         editing = {editing}
                         setEditing = {() => {
                             thisRow.editing = !editing;
-                            if (thisRow.editing){
-                                thisRow.newName = thisRow.name; //set to default on edit start
+                            if (thisRow.editing){//set to default on edit start
+                                thisRow.newName = thisRow.name;
+                                thisRow.newAccountNumber = thisRow.account_number;
                             }
-                            console.log(accounts);
                             setAccounts([...accounts]);
                         }}
-                        handleEdit = {() => {handleAccountEdit(thisRow.bank_account_id, thisRow.name, thisRow.newName);}}
+                        handleEdit = {() => {handleAccountEdit(thisRow.bank_account_id, thisRow.name, thisRow.newName, thisRow.account_number, thisRow.newAccountNumber);}}
                         handleDelete = {() => {handleAccountDelete(thisRow.bank_account_id);}}
                     />
                 )

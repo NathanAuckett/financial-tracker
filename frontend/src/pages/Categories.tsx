@@ -45,6 +45,7 @@ const Categories:FC<{}> = () => {
 
     useEffect(() => {
         fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {

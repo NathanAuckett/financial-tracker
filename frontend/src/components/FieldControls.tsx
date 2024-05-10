@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Button } from "antd";
+import { Button, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 
 
@@ -28,9 +28,17 @@ const FieldControls:FC<IChart> = (props) => {
                     <Button type='link' onClick={()=>{setEditing(true)}}>
                         <EditOutlined/>
                     </Button>
-                    <Button type='text' danger onClick={()=>{handleDelete()}}>
-                        <DeleteOutlined/>
-                    </Button>
+                    <Popconfirm
+                        placement="topRight"
+                        title="Delete?"
+                        description="Are you sure you want to delete this?"
+                        onConfirm={()=>{handleDelete()}}
+                        okText="Yes"
+                    >
+                        <Button type='text' danger>
+                            <DeleteOutlined/>
+                        </Button>
+                    </Popconfirm>
                 </>
             }
         </>

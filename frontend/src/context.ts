@@ -24,3 +24,7 @@ export const AccountsContext = createContext<AccountsContextType>({
     setAccounts: () => {console.log("getAccounts function not set")},
     getAccounts: () => {console.log("setAccounts function not set")}
 });
+
+export const MessageContext = createContext<{showMessage: Function}>({
+    showMessage: () => {console.log("showMessage function not set")}
+});

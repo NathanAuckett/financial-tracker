@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 
@@ -12,10 +12,11 @@ import CSVDictionaries from './pages/CSVDictionaries';
 
 import axios from 'axios';
 
-import { UserContext, AccountsContext } from './context';
+import { UserContext, AccountsContext, MessageContext } from './context';
 import { Account } from './types';
 
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, message } from 'antd';
+import { NoticeType } from 'antd/es/message/interface';
 const {Header} = Layout;
 
 
@@ -23,11 +24,22 @@ const {Header} = Layout;
 function App() {
   const [userID, setUserID] = useState(1);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [messageApi, messageContextHolder] = message.useMessage();
   const navigate = useNavigate();
 
   useEffect(() => {
     getAccounts(userID);
   }, [userID]);
+
+  function showMessage(type: NoticeType, content: string) {
+    messageApi.open({
+        type: type,
+        content: content,
+        style: {
+            marginTop: "8vh"
+        }
+    });
+}
 
   async function getAccounts(user_id = 1){
     await axios.get(`${process.env.REACT_APP_API_ROOT}bank_accounts/get_bank_accounts`, { //body gets ignored on get requests
@@ -99,6 +111,7 @@ function App() {
 
   return (
     <div className="App">
+      {messageContextHolder}
       <Layout>
         <Header style={{display: "flex", color: "white", alignItems: "center", justifyContent: "center"}}>
           <span style={{marginRight: 50}}>Financial Tracker</span>
@@ -110,17 +123,19 @@ function App() {
           />
         </Header>
         
-        <UserContext.Provider value={{userID, setUserID}}>
-        <AccountsContext.Provider value={{accounts, setAccounts, getAccounts}}>
-          <Routes>
-            {
-              navRoutes.map((route) => {
-                return <Route path = {route.path} element = {route.component} />
-              })
-            }
-          </Routes>
-        </AccountsContext.Provider>
-        </UserContext.Provider>
+        <MessageContext.Provider value={{showMessage}}>
+          <UserContext.Provider value={{userID, setUserID}}>
+            <AccountsContext.Provider value={{accounts, setAccounts, getAccounts}}>
+              <Routes>
+                {
+                  navRoutes.map((route) => {
+                    return <Route path = {route.path} element = {route.component} />
+                  })
+                }
+              </Routes>
+            </AccountsContext.Provider>
+          </UserContext.Provider>
+        </MessageContext.Provider>
       </Layout>
     </div>
   );

@@ -1,12 +1,13 @@
 import { FC, useContext, useEffect } from "react";
-import { Card, Row, Button, Form, Input, Table } from "antd";
+import { Card, Row, Button, Form, Input, Table, message } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { UserContext, AccountsContext, AccountsContextType } from '../context';
+import { UserContext, AccountsContext, AccountsContextType, MessageContext } from '../context';
 import type { Account } from "../types";
 
 import FieldControls from '../components/FieldControls';
+import { NoticeType } from "antd/es/message/interface";
 
 type AccountRow = Account & {
     editing: boolean;
@@ -33,7 +34,8 @@ function findAccountIndexFromID(accounts:AccountRow[], bank_account_id:number){
 const Accounts:FC = () => {
     const { userID } = useContext(UserContext);
     const { accounts, setAccounts, getAccounts} = useContext<AccountsContextType>(AccountsContext) as {accounts: AccountRow[], setAccounts:Function, getAccounts:Function};
-    
+    const { showMessage } = useContext(MessageContext);
+
     useEffect(() => {
         accounts.forEach((e) => {
             e.newName = AccountRowDefaults.newName;
@@ -51,9 +53,11 @@ const Accounts:FC = () => {
         })
         .then((response) => {
             console.log(response.data);
+            showMessage("success", "Account Created!");
             getAccounts(userID);
         })
         .catch((error:Error) => {
+            showMessage("error", "Account creation failed!");
             console.log(error.message);
         });
     }
@@ -68,9 +72,11 @@ const Accounts:FC = () => {
                 account_number: newAccountNumber
             })
             .then(() => {
+                showMessage("success", "Account Updated!");
                 getAccounts();
             })
             .catch((error:Error) => {
+                showMessage("error", "Account edit failed!");
                 console.log(error.message);
             });
         }
@@ -88,9 +94,11 @@ const Accounts:FC = () => {
             }
         })
         .then(() => {
+            showMessage("success", "Account Deleted!");
             getAccounts();
         })
         .catch((error:Error) => {
+            showMessage("error", "Account deletion failed!");
             console.log(error.message);
         });
     }

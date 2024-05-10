@@ -3,7 +3,7 @@ import axios from "axios";
 import type { Category } from "../types";
 
 export async function getCategories(userID:number):Promise<Category[]>{
-    const categories = await axios.get('http://localhost:3000/categories/get_categories', {
+    const categories = await axios.get(`${process.env.REACT_APP_API_ROOT}categories/get_categories`, {
         params:{
             user_id: userID,
             columns: JSON.stringify(["category_id", "name"])

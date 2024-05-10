@@ -48,7 +48,7 @@ const Categories:FC<{}> = () => {
     },[]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
-        await axios.post('http://localhost:3000/categories/category', {
+        await axios.post(`${process.env.REACT_APP_API_ROOT}categories/category`, {
             user_id: userID,
             ...values
         })
@@ -63,7 +63,7 @@ const Categories:FC<{}> = () => {
 
     async function handleCategoryEdit(category_id:number, oldName:string, newName:string){
         if (oldName !== newName){
-            await axios.patch("http://localhost:3000/categories/update_category", {
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}categories/update_category`, {
                 user_id: userID,
                 category_id: category_id,
                 name: newName
@@ -82,7 +82,7 @@ const Categories:FC<{}> = () => {
     }
 
     async function handleCategoryDelete(category_id:number){
-        await axios.delete("http://localhost:3000/categories/delete_category", {
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}categories/delete_category`, {
             params: {
                 user_id: userID,
                 category_id: category_id

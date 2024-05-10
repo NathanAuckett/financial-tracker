@@ -47,7 +47,7 @@ function transactionsConcatCategoryNames(transactionData: object[]): void{
 }
 
 async function getTransactions(transactionsSetter:Function, user_id = 1, bank_account_id = 1) {
-  await axios.get('http://localhost:3000/transactions/get-transactions', {
+  await axios.get(`${process.env.REACT_APP_API_ROOT}transactions/get-transactions`, {
     params:{
       user_id: user_id,
       bank_account_id: bank_account_id,
@@ -102,8 +102,6 @@ const DataView:FC<props> = (props) => {
                   <AccountDropDown
                     accounts={accounts}
                     selectedAccount={selectedAccount}
-                    //getTransactions={getTransactions}
-                    //setTransactions={setTransactions}
                     setSelectedAccount={setSelectedAccount}
                   />
               </Sider>

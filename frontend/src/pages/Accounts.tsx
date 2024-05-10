@@ -37,11 +37,12 @@ const Accounts:FC = () => {
             e.newName = AccountRowDefaults.newName;
             e.editing = AccountRowDefaults.editing;
         });
-        console.log(accounts);
-    }, [accounts]);
+        console.log("Effect:", accounts);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSubmit:FormProps<FieldType>['onFinish'] = async (values) => {
-        await axios.post('http://localhost:3000/bank_accounts/bank_account', {
+        await axios.post(`${process.env.REACT_APP_API_ROOT}bank_accounts/bank_account`, {
             user_id: userID,
             ...values
         })

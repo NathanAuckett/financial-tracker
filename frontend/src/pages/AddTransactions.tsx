@@ -25,7 +25,7 @@ const AddTransactions:FC<props> = (props) => {
         console.log(formData);
 
         await axios({
-            url: `http://localhost:3000/transactions/uploadCSV?user_id=${userID}`,
+            url: `${process.env.REACT_APP_API_ROOT}transactions/uploadCSV?user_id=${userID}`,
             method: "POST",
             data: formData,
             headers: {

@@ -11,4 +11,8 @@ router.get("/", (req, res) => {
 
 router.get("/get_bank_accounts", controller.getBankAccounts);
 
+router.delete("/delete_bank_account", controller.deleteBankAccount);
+
+router.patch("/update_bank_account", controller.updateBankAccount);
+
 module.exports = router;

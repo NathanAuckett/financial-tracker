@@ -79,7 +79,7 @@ async function updateCategory(req:Request, res: Response) {
 
     if (!user_id || !category_id || !name){
         return res.status(400).json({
-            message: 'Delete failed! Missing user_id or category_id from request.',
+            message: 'Update failed! Missing user_id or category_id from request.',
             query: req.query
         }); 
     }

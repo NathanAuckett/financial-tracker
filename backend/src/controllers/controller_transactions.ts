@@ -332,16 +332,6 @@ async function getTransactions(req: Request, res: Response){
 
     await Transaction.findAll(query)
     .then((response:object[]) => {
-        // console.log(response);
-        // let [results, metadata] = response;
-
-        // if (results === undefined){
-        //     results = [];
-        // }
-        // if (!Array.isArray(results)){
-        //     results = [results];
-        // }
-        
         return res.status(201).json({
             message: `${response.length} of max ${limit} transactions for user_id ${user_id} fetched. Offset: ${offset}`,
             categories: categories ? categories : "not provided",

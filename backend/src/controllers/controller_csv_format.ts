@@ -21,10 +21,8 @@ async function getFormats(req: Request, res: Response){
         }
     })
     .then((response: {rowCount: number}[][]) => {
-        const [results, metadata] = response;
-        
         return res.status(201).json({
-            formats: [results]
+            formats: response
         });
     })
     .catch((error:Error) => {
@@ -79,7 +77,7 @@ async function updateCSVFormat(req:Request, res: Response) {
         }); 
     }
 
-    await BankAccount.update(updateValues,
+    await CSVFormat.update(updateValues,
         {
             where: {
                 user_id: user_id,

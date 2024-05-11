@@ -5,10 +5,11 @@ import axios from "axios";
 
 import { getCategories } from '../helper-functions/getCategories';
 
-import { UserContext } from '../context';
+import { UserContext, MessageContext } from '../context';
 import type { Category } from '../types';
 
 import FieldControls from '../components/FieldControls';
+import EditableTableField from '../components/EditableTableField';
 
 type CategoryRow = Category & {
     editing: boolean;
@@ -29,6 +30,7 @@ function findCategoryIndexFromID(categories:CategoryRow[], category_id:number){
 const Categories:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [categories, setCategories] = useState<CategoryRow[]>([]);
+    const { showMessage } = useContext(MessageContext);
 
     async function fetchCategories() {
         const categories = await getCategories(userID as number) as CategoryRow[];
@@ -54,25 +56,28 @@ const Categories:FC<{}> = () => {
             ...values
         })
         .then((response) => {
-            console.log(response.data);
+            showMessage("success", "Category Created!");
             fetchCategories();
         })
         .catch((error) => {
+            showMessage("error", "Category creation failed!");
             console.log(error);
         });
     }
 
     async function handleCategoryEdit(category_id:number, oldName:string, newName:string){
         if (oldName !== newName){
-            await axios.patch(`${process.env.REACT_APP_API_ROOT}categories/update_category`, {
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}categories/update-category`, {
                 user_id: userID,
                 category_id: category_id,
                 name: newName
             })
             .then(() => {
+                showMessage("success", "Category Updated!");
                 fetchCategories();
             })
             .catch((error:Error) => {
+                showMessage("error", "Category update failed!");
                 console.log(error.message);
             });
         }
@@ -83,16 +88,18 @@ const Categories:FC<{}> = () => {
     }
 
     async function handleCategoryDelete(category_id:number){
-        await axios.delete(`${process.env.REACT_APP_API_ROOT}categories/delete_category`, {
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}categories/delete-category`, {
             params: {
                 user_id: userID,
                 category_id: category_id
             }
         })
         .then(() => {
+            showMessage("success", "Category deleted!");
             fetchCategories();
         })
         .catch((error:Error) => {
+            showMessage("error", "Category deletion failed!");
             console.log(error.message);
         });
     }
@@ -104,24 +111,34 @@ const Categories:FC<{}> = () => {
             key: 'name',
             align: 'left' as const,
             render: (text:string, {category_id, name}:Category, index:number) => {
-                const thisCategoryRow = findCategoryIndexFromID(categories, category_id);
+                const thisRow = findCategoryIndexFromID(categories, category_id);
                 return (
-                    <>
-                        {thisCategoryRow.editing ?
-                            <Input 
-                                name='name'
-                                defaultValue={name}
-                                style={{display: "inline", width:"max-content"}}
-                                onChange={(element) => {
-                                    thisCategoryRow.newName = element.target.value;
-                                    setCategories([...categories]);
-                                }}
-                            />
-                        :
-                            <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                        }
-                    </>
+                    <EditableTableField
+                        currentValue={name}
+                        row={thisRow}
+                        onChange={( element:{ target:{value:string} } ) => {
+                            thisRow.newName = element.target.value;
+                            setCategories([...categories]);
+                        }}
+                    />
                 )
+                // return (
+                //     <>
+                //         {thisCategoryRow.editing ?
+                //             <Input 
+                //                 name='name'
+                //                 defaultValue={name}
+                //                 style={{display: "inline", width:"max-content"}}
+                //                 onChange={(element) => {
+                //                     thisCategoryRow.newName = element.target.value;
+                //                     setCategories([...categories]);
+                //                 }}
+                //             />
+                //         :
+                //             <p style={{display:"inline", marginRight: 5}}>{name}</p>
+                //         }
+                //     </>
+                // )
             }
         },
         {

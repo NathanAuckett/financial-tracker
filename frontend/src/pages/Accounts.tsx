@@ -1,5 +1,5 @@
 import { FC, useContext, useEffect } from "react";
-import { Card, Row, Button, Form, Input, Table, message } from "antd";
+import { Card, Row, Button, Form, Input, Table } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -7,7 +7,7 @@ import { UserContext, AccountsContext, AccountsContextType, MessageContext } fro
 import type { Account } from "../types";
 
 import FieldControls from '../components/FieldControls';
-import { NoticeType } from "antd/es/message/interface";
+import EditableTableField from "../components/EditableTableField";
 
 type AccountRow = Account & {
     editing: boolean;
@@ -42,12 +42,11 @@ const Accounts:FC = () => {
             e.newAccountNumber = AccountRowDefaults.newAccountNumber;
             e.editing = AccountRowDefaults.editing;
         });
-        console.log("Effect:", accounts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSubmit:FormProps<FieldType>['onFinish'] = async (values) => {
-        await axios.post(`${process.env.REACT_APP_API_ROOT}bank_accounts/bank_account`, {
+        await axios.post(`${process.env.REACT_APP_API_ROOT}bank-accounts/bank-account`, {
             user_id: userID,
             ...values
         })
@@ -65,7 +64,7 @@ const Accounts:FC = () => {
 
     async function handleAccountEdit(bank_account_id:number, oldName:string, newName:string, oldAccountNumber:string, newAccountNumber:string){
         if (oldName !== newName || oldAccountNumber !== newAccountNumber){
-            await axios.patch(`${process.env.REACT_APP_API_ROOT}bank_accounts/update_bank_account`, {
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}bank-accounts/update-bank-account`, {
                 user_id: userID,
                 bank_account_id: bank_account_id,
                 name: newName,
@@ -87,7 +86,7 @@ const Accounts:FC = () => {
     }
 
     async function handleAccountDelete(bank_account_id:number){
-        await axios.delete(`${process.env.REACT_APP_API_ROOT}bank_accounts/delete_bank_account`, {
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}bank-accounts/delete-bank-account`, {
             params: {
                 user_id: userID,
                 bank_account_id: bank_account_id
@@ -112,21 +111,14 @@ const Accounts:FC = () => {
             render: (text:string, {bank_account_id, name}:Account, index:number) => {
                 const thisRow = findAccountIndexFromID(accounts, bank_account_id);
                 return (
-                    <>
-                        {thisRow.editing ?
-                            <Input 
-                                name='name'
-                                defaultValue={name}
-                                style={{display: "inline", width:"max-content"}}
-                                onChange={(element) => {
-                                    thisRow.newName = element.target.value;
-                                    setAccounts([...accounts]);
-                                }}
-                            />
-                        :
-                            <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                        }
-                    </>
+                    <EditableTableField
+                        currentValue={name}
+                        row={thisRow}
+                        onChange={( element:{ target:{value:string} } ) => {
+                            thisRow.newName = element.target.value;
+                            setAccounts([...accounts]);
+                        }}
+                    />
                 )
             }
         },
@@ -138,21 +130,14 @@ const Accounts:FC = () => {
             render: (text:string, {bank_account_id, account_number}:Account, index:number) => {
                 const thisRow = findAccountIndexFromID(accounts, bank_account_id);
                 return (
-                    <>
-                        {thisRow.editing ?
-                            <Input 
-                                name='account_number'
-                                defaultValue={account_number}
-                                style={{display: "inline", width:"max-content"}}
-                                onChange={(element) => {
-                                    thisRow.newAccountNumber = element.target.value;
-                                    setAccounts([...accounts]);
-                                }}
-                            />
-                        :
-                            <p style={{display:"inline", marginRight: 5}}>{account_number}</p>
-                        }
-                    </>
+                    <EditableTableField
+                        currentValue={account_number}
+                        row={thisRow}
+                        onChange={( element:{ target:{value:string} } ) => {
+                            thisRow.newAccountNumber = element.target.value;
+                            setAccounts([...accounts]);
+                        }}
+                    />
                 )
             }
         },

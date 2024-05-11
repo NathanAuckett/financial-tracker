@@ -8,7 +8,7 @@ import Accounts from './pages/Accounts';
 import AddTransactions from './pages/AddTransactions';
 import Categories from './pages/Categories';
 import Patterns from './pages/Patterns';
-import CSVDictionaries from './pages/CSVDictionaries';
+import CSVFormats from './pages/CSVFormats';
 
 import axios from 'axios';
 
@@ -68,9 +68,9 @@ function App() {
     },
     {
       key: 1,
-      label: "CSV Dictionaries",
-      path: "/csv-dictionaries",
-      component: <CSVDictionaries/>
+      label: "CSV Formats",
+      path: "/csv-formats",
+      component: <CSVFormats/>
     },
     {
       key: 2,

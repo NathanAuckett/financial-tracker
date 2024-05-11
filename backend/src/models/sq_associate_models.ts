@@ -6,16 +6,16 @@ const {Category} = require('./model_category');
 const {Pattern} = require('./model_pattern');
 const {PatternGroup} = require('./model_pattern_group');
 const {TransactionCategory} = require('./model_transaction_category');
-const {CSVDictionary} = require('./model_csv_dictionary');
+const {CSVFormat} = require('./model_csv_format');
 
 // Set associations between models
 User.hasMany(Transaction, {foreignKey: "user_id"});
 User.hasMany(BankAccount, {foreignKey: "user_id"});
 User.hasMany(PatternGroup, {foreignKey: "user_id"});
 User.hasMany(Category, {foreignKey: "user_id"});
-User.hasMany(CSVDictionary, {foreignKey: "user_id"});
+User.hasMany(CSVFormat, {foreignKey: "user_id"});
 
-CSVDictionary.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
+CSVFormat.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
 
 Transaction.belongsTo(User, {foreignKey: "user_id", onDelete: "CASCADE"});
 Transaction.belongsTo(BankAccount, {foreignKey: "bank_account_id", onDelete: "CASCADE"});

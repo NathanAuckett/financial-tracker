@@ -1,7 +1,7 @@
-import {Request, Response} from 'express';
-import {Op} from 'sequelize'
+import { Request, Response } from 'express';
+import { Op } from 'sequelize'
 const { sq } = require('../config/db_sequelize');
-const { Transaction, Category, BankAccount, CSVDictionary } = require('../models/');
+const { Transaction, Category, BankAccount, CSVFormat } = require('../models/');
 const fs = require('fs');
 const csv = require('csv-parse/sync');
 
@@ -10,7 +10,7 @@ import transactionsCalculateCategories from '../queries/query_all_transactions_c
 
 async function uploadCSV(req:Request & {file?:object}, res:Response){
     let { user_id } = req.query;
-    const csv_dictionary_id = 1;
+    const csv_format_id = 1;
     type FileType = {
         path: string
     }
@@ -111,11 +111,11 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
         
         let dictionary = {};
 
-        await CSVDictionary.findOne({
+        await CSVFormat.findOne({
             attributes: ["bank_name", "account_number", "transaction_date", "credit", "debit", "description", "type", "balance"],
             where: {
                 user_id: user_id,
-                csv_dictionary_id: csv_dictionary_id
+                csv_dictionary_id: csv_format_id
             }
         })
         .then((results:{dataValues:object}) => {
@@ -123,7 +123,7 @@ async function uploadCSV(req:Request & {file?:object}, res:Response){
         })
         .catch((error:Error) => {
             return res.status(400).json({
-                message: `Unable to find CSV dictionary with user_id:${user_id} and/or csv_dictionary_id:${csv_dictionary_id}`,
+                message: `Unable to find CSV dictionary with user_id:${user_id} and/or csv_dictionary_id:${csv_format_id}`,
                 error: error.message
             });
         });

@@ -14,7 +14,7 @@ function serverStart(){
   const routerCategories = require("./routes/route_categories");
   const routerPatterns = require("./routes/route_patterns");
   const routerPatternGroups = require("./routes/route_pattern_groups");
-  const routerCSVDictionary = require("./routes/route_csv_dictionary");
+  const routerCSVFormat = require("./routes/route_csv_format");
 
   app.use(express.json());
 
@@ -23,12 +23,12 @@ function serverStart(){
   });
 
   app.use("/users", routerUsers);
-  app.use("/bank_accounts", routerBankAccounts);
+  app.use("/bank-accounts", routerBankAccounts);
   app.use("/patterns", routerPatterns);
-  app.use("/pattern_groups", routerPatternGroups);
+  app.use("/pattern-groups", routerPatternGroups);
   app.use("/categories", routerCategories);
   app.use("/transactions", routerTransactions);
-  app.use("/csv_dictionaries", routerCSVDictionary);
+  app.use("/csv-formats", routerCSVFormat);
 
   app.listen(PORT, () => {
     console.log(`API listening on port: ${PORT}`);

@@ -1,8 +1,8 @@
 const { sq } = require('../config/db_sequelize');
 const { DataTypes } = require('sequelize');
 
-export const CSVDictionary = sq.define('csv_dictionary', {
-    csv_dictionary_id: {
+export const CSVFormat = sq.define('csv_format', {
+    csv_format_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true

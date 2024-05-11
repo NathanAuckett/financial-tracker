@@ -9,6 +9,6 @@ router.get("/", (req, res) => {
     res.send("insert patterns here");
 });
 
-router.get("/get_patterns", controller.getPatterns);
+router.get("/get-patterns", controller.getPatterns);
 
 module.exports = router;

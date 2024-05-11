@@ -9,10 +9,10 @@ router.get("/", (req, res) => {
     res.send("insert categories here");
 });
 
-router.get("/get_categories", controller.getCategories);
+router.get("/get-categories", controller.getCategories);
 
-router.delete("/delete_category", controller.deleteCategory);
+router.delete("/delete-category", controller.deleteCategory);
 
-router.patch("/update_category", controller.updateCategory);
+router.patch("/update-category", controller.updateCategory);
 
 module.exports = router;

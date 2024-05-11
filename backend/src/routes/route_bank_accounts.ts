@@ -9,10 +9,10 @@ router.get("/", (req, res) => {
     res.send("insert bank accounts here");
 });
 
-router.get("/get_bank_accounts", controller.getBankAccounts);
+router.get("/get-bank-accounts", controller.getBankAccounts);
 
-router.delete("/delete_bank_account", controller.deleteBankAccount);
+router.delete("/delete-bank-account", controller.deleteBankAccount);
 
-router.patch("/update_bank_account", controller.updateBankAccount);
+router.patch("/update-bank-account", controller.updateBankAccount);
 
 module.exports = router;

@@ -62,7 +62,7 @@ export const CSVDictionaries:FC<props> = (props) => {
     const [ dictionaries, setDictionaries ] = useState<object[]>([]);
 
     async function getDictionaries() {
-        await axios.get(`${process.env.REACT_APP_API_ROOT}csv_dictionaries/get-dictionaries`, {
+        await axios.get(`${process.env.REACT_APP_API_ROOT}csv-dictionaries/get-dictionaries`, {
             params:{
                 user_id: userID,
                 columns: undefined

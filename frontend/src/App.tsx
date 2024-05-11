@@ -42,7 +42,7 @@ function App() {
 }
 
   async function getAccounts(user_id = 1){
-    await axios.get(`${process.env.REACT_APP_API_ROOT}bank_accounts/get_bank_accounts`, { //body gets ignored on get requests
+    await axios.get(`${process.env.REACT_APP_API_ROOT}bank-accounts/get-bank-accounts`, { //body gets ignored on get requests
       params: {
         user_id: user_id,
         columns: JSON.stringify(["bank_account_id", "account_number", "name"])

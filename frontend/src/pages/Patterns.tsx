@@ -22,7 +22,7 @@ const Patterns:FC<{}> = () => {
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log(values);
         
-        await axios.post(`${process.env.REACT_APP_API_ROOT}pattern_groups/pattern_group`, {
+        await axios.post(`${process.env.REACT_APP_API_ROOT}pattern-groups/pattern-group`, {
             user_id: userID,
             category_id: values.category_id,
             name: values.name
@@ -37,7 +37,7 @@ const Patterns:FC<{}> = () => {
     }
 
     async function getPatternGroups() {
-        await axios.get(`${process.env.REACT_APP_API_ROOT}pattern_groups/get_pattern_groups`, {
+        await axios.get(`${process.env.REACT_APP_API_ROOT}pattern-groups/get-pattern-groups`, {
             params:{
                 user_id: userID,
                 columns: JSON.stringify(["pattern_group_id", "name", "category_id"])
@@ -55,7 +55,7 @@ const Patterns:FC<{}> = () => {
     }
 
     async function getCategories() {
-        await axios.get(`${process.env.REACT_APP_API_ROOT}categories/get_categories`, {
+        await axios.get(`${process.env.REACT_APP_API_ROOT}categories/get-categories`, {
             params:{
                 user_id: userID,
                 columns: JSON.stringify(["category_id", "name"])

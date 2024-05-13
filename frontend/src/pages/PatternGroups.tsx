@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useContext } from 'react';
-import { Card, Col, Row, Button, Form, Input, Table, Checkbox, Select } from "antd";
+import { Card, Row, Button, Form, Input, Table, Select } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -12,25 +12,6 @@ type CategorySelectOptionType = {
     name?:string,
     value?:number,
     label?:string
-}
-
-// type PatternGroupType = {
-//     pattern_group_id?: number,
-//     category_id?: number,
-//     name: string,
-//     patterns: PatternType[]
-// }
-
-type PatternType = {
-    pattern_id?: number,
-    name: string,
-    regex_array: string[],
-    match_array: boolean[]
-}
-
-type PatternDataType = {
-    regex: string,
-    match: string
 }
 
 const PatternGroups:FC<{}> = () => {
@@ -114,57 +95,11 @@ const PatternGroups:FC<{}> = () => {
             title: "Category ID",
             dataIndex: "category_id"
         }
-    ]
-
-    // const renderPatternRegex = (pattern:PatternType) => {
-    //     const data: PatternDataType[] = [];
-
-    //     pattern.regex_array.forEach((e, i) => {
-    //         data.push({
-    //             regex: e,
-    //             match: pattern.match_array[i] ? "True" : "False"
-    //         });
-    //     });
-
-    //     const patternColumns = [
-    //         {
-    //             title: "regex",
-    //             dataIndex: "regex",
-    //         },
-    //         {
-    //             title: "match",
-    //             dataIndex: "match"
-    //         }
-    //     ];
-
-    //     return (
-    //         <Table
-    //             dataSource={data}
-    //             columns={patternColumns}
-    //             pagination={false}
-    //         />
-    //     )
-    // }
+    ];
 
     const renderPatternGroup = (patternGroup: PatternGroupType) => {
-        // const patterns = patternGroup.patterns;
-
-        // const patternColumns = [
-        //     {
-        //         title: "Pattern Name",
-        //         dataIndex: "name"
-        //     }
-        // ];
-
         return (
             <PatternGroup patternGroup={patternGroup} getPatternGroups={getPatternGroups}/>
-            // <Table
-            //     rowKey="pattern_id"
-            //     dataSource={patterns}
-            //     columns={patternColumns}
-            //     expandable={{expandedRowRender: renderPatternRegex}}
-            //     pagination={false}
-            // />
         )
     }
 

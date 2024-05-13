@@ -23,6 +23,7 @@ export const PatternGroup:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const { patternGroup, getPatternGroups } = props;
     const patterns = patternGroup.patterns;
+    console.log("Patterns", patterns);
     
     const [showForm, setShowForm] = useState(false);
 
@@ -51,13 +52,9 @@ export const PatternGroup:FC<props> = (props) => {
         });
     }
     
-    function renderPatternRegex() {
+    function renderPatternRegex(pattern:PatternType) {
         return (
-            <>
-                {patterns.map((pattern) => {
-                    return <Pattern pattern={pattern}/>
-                })}
-            </>
+            <Pattern pattern={pattern}/>
         )
     }
 

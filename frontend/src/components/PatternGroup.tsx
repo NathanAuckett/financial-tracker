@@ -14,40 +14,29 @@ export type PatternGroupType = {
     patterns: PatternType[]
 }
 
-interface props extends PatternGroupType {
-    getPatternGroups: Function
+interface props {
+    patternGroup: PatternGroupType;
+    getPatternGroups: Function;
 }
 
 export const PatternGroup:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
-    const { name, patterns, category_id, pattern_group_id, getPatternGroups } = props;
+    const { patternGroup, getPatternGroups } = props;
+    const patterns = patternGroup.patterns;
     
     const [showForm, setShowForm] = useState(false);
 
-    const columns = [
-        {
-            title: "Name",
-            dataIndex: "name",
-            key: "name"
-        },
-        {
-            title: "Category ID",
-            dataIndex: "category_id",
-            key: "category_id"
-        }
-    ]
-
     const handleSubmit:FormProps['onFinish'] = async (values) => {
-        console.log({
+        console.log("Submit", {
             user_id: userID,
-            pattern_group_id: pattern_group_id,
+            pattern_group_id: patternGroup.pattern_group_id,
             name: values.name,
             regex_array: values.regex_array,
             match_array: values.match_array
         });
         
-        await axios.post('http://localhost:3000/patterns/pattern', {
-            pattern_group_id: pattern_group_id,
+        await axios.post(`${process.env.REACT_APP_API_ROOT}patterns/pattern`, {
+            pattern_group_id: patternGroup.pattern_group_id,
             name: values.name,
             regex_array: [values.regex_array],
             match_array: [values.match_array]
@@ -61,15 +50,33 @@ export const PatternGroup:FC<props> = (props) => {
             console.log(error);
         });
     }
+    
+    function renderPatternRegex() {
+        return (
+            <>
+                {patterns.map((pattern) => {
+                    return <Pattern pattern={pattern}/>
+                })}
+            </>
+        )
+    }
+
+    const patternColumns = [
+        {
+            title: "Pattern Name",
+            dataIndex: "name"
+        }
+    ];
 
     return (
-        <Flex vertical style={{borderStyle: 'solid', width:400}}>
-            <h3>Group: {name} ---{">"} Category: {category_id}</h3>
-            
-            {/* Show patterns */}
-            {patterns.map((e) => {
-                return <Pattern name={e.name} regex_array={e.regex_array} match_array={e.match_array}/>
-            })}
+        <>
+            <Table
+                rowKey="pattern_id"
+                dataSource={patterns}
+                columns={patternColumns}
+                expandable={{expandedRowRender: renderPatternRegex}}
+                pagination={false}
+            />
             
             {showForm ? 
                 <>
@@ -119,8 +126,7 @@ export const PatternGroup:FC<props> = (props) => {
             : 
                 <Button onClick={() => {setShowForm(true)}}>Add Pattern</Button>
             }
-            
-        </Flex>
+        </>
     )
 }
 

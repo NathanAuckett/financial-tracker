@@ -5,6 +5,8 @@ import axios from "axios";
 
 import { UserContext } from '../context';
 
+import { PatternGroup, PatternGroupType } from '../components/PatternGroup'
+
 type CategorySelectOptionType = {
     category_id?:number,
     name?:string,
@@ -12,12 +14,12 @@ type CategorySelectOptionType = {
     label?:string
 }
 
-type PatternGroupType = {
-    pattern_group_id?: number,
-    category_id?: number,
-    name: string,
-    patterns: PatternType[]
-}
+// type PatternGroupType = {
+//     pattern_group_id?: number,
+//     category_id?: number,
+//     name: string,
+//     patterns: PatternType[]
+// }
 
 type PatternType = {
     pattern_id?: number,
@@ -31,7 +33,7 @@ type PatternDataType = {
     match: string
 }
 
-const Patterns:FC<{}> = () => {
+const PatternGroups:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [patternGroups, setPatternGroups] = useState([]);
     const [categorySelectOptions, setCategorySelectOptions] = useState<CategorySelectOptionType[]>([]);
@@ -114,59 +116,55 @@ const Patterns:FC<{}> = () => {
         }
     ]
 
-    const renderPatternRegex = (pattern:PatternType) => {
+    // const renderPatternRegex = (pattern:PatternType) => {
+    //     const data: PatternDataType[] = [];
 
-        const data: PatternDataType[] = [];
+    //     pattern.regex_array.forEach((e, i) => {
+    //         data.push({
+    //             regex: e,
+    //             match: pattern.match_array[i] ? "True" : "False"
+    //         });
+    //     });
 
-        pattern.regex_array.forEach((e, i) => {
-            data.push({
-                regex: e,
-                match: pattern.match_array[i] ? "True" : "False"
-            });
-        });
+    //     const patternColumns = [
+    //         {
+    //             title: "regex",
+    //             dataIndex: "regex",
+    //         },
+    //         {
+    //             title: "match",
+    //             dataIndex: "match"
+    //         }
+    //     ];
 
-        const patternColumns = [
-            {
-                title: "regex",
-                dataIndex: "regex",
-            },
-            {
-                title: "match",
-                dataIndex: "match"
-            }
-        ];
-
-        return (
-            <>
-                <Table
-                    dataSource={data}
-                    columns={patternColumns}
-                    pagination={false}
-                />
-            </>
-        )
-    }
+    //     return (
+    //         <Table
+    //             dataSource={data}
+    //             columns={patternColumns}
+    //             pagination={false}
+    //         />
+    //     )
+    // }
 
     const renderPatternGroup = (patternGroup: PatternGroupType) => {
-        const patterns = patternGroup.patterns;
+        // const patterns = patternGroup.patterns;
 
-        const patternColumns = [
-            {
-                title: "Pattern Name",
-                dataIndex: "name"
-            }
-        ];
+        // const patternColumns = [
+        //     {
+        //         title: "Pattern Name",
+        //         dataIndex: "name"
+        //     }
+        // ];
 
         return (
-            <>
-                <Table
-                    rowKey="pattern_id"
-                    dataSource={patterns}
-                    columns={patternColumns}
-                    expandable={{expandedRowRender: renderPatternRegex}}
-                    pagination={false}
-                />
-            </>
+            <PatternGroup patternGroup={patternGroup} getPatternGroups={getPatternGroups}/>
+            // <Table
+            //     rowKey="pattern_id"
+            //     dataSource={patterns}
+            //     columns={patternColumns}
+            //     expandable={{expandedRowRender: renderPatternRegex}}
+            //     pagination={false}
+            // />
         )
     }
 
@@ -225,4 +223,4 @@ const Patterns:FC<{}> = () => {
     </>
 }
 
-export default Patterns;
+export default PatternGroups;

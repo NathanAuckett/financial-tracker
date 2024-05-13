@@ -7,7 +7,7 @@ import DataView from './pages/DataView';
 import Accounts from './pages/Accounts';
 import AddTransactions from './pages/AddTransactions';
 import Categories from './pages/Categories';
-import Patterns from './pages/Patterns';
+import PatternGroups from './pages/PatternGroups';
 import CSVFormats from './pages/CSVFormats';
 
 import axios from 'axios';
@@ -94,7 +94,7 @@ function App() {
       key: 5,
       label: "Patterns",
       path: "/patterns",
-      component: <Patterns/>
+      component: <PatternGroups/>
     },
   ];
 

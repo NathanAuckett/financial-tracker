@@ -122,23 +122,6 @@ const Categories:FC<{}> = () => {
                         }}
                     />
                 )
-                // return (
-                //     <>
-                //         {thisCategoryRow.editing ?
-                //             <Input 
-                //                 name='name'
-                //                 defaultValue={name}
-                //                 style={{display: "inline", width:"max-content"}}
-                //                 onChange={(element) => {
-                //                     thisCategoryRow.newName = element.target.value;
-                //                     setCategories([...categories]);
-                //                 }}
-                //             />
-                //         :
-                //             <p style={{display:"inline", marginRight: 5}}>{name}</p>
-                //         }
-                //     </>
-                // )
             }
         },
         {

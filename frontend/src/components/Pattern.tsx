@@ -13,43 +13,38 @@ export type PatternDataType = {
     match: string
 }
 
-export const Pattern:FC<PatternType> = (props) => {
-    //const data = props.patterns as unknown as PatternType;
+interface props {
+    pattern: PatternType;
+}
 
-    const data:PatternDataType[] = [];
-    
-    props.regex_array.forEach((element, index) => {
-        const obj:PatternDataType = {
-            regex: element,
-            match: props.match_array[index].toString()
-        };
+export const Pattern:FC<props> = (props) => {
+    const { pattern } = props;
+    const data: PatternDataType[] = [];
 
-        data.push(obj);
+    pattern.regex_array.forEach((e, i) => {
+        data.push({
+            regex: e,
+            match: pattern.match_array[i] ? "True" : "False"
+        });
     });
 
+    const patternColumns = [
+        {
+            title: "regex",
+            dataIndex: "regex",
+        },
+        {
+            title: "match",
+            dataIndex: "match"
+        }
+    ];
+
     return (
-        <Flex vertical style={{borderStyle: 'solid none solid'}}>
-        <h3>Pattern: {props.name}</h3>
         <Table
-            style = {{width:800, textAlign:"center"}}
-            dataSource = {data}
-            columns = {[
-                {
-                    title: 'Regex',
-                    dataIndex: 'regex',
-                    key: 'regex',
-                    align: 'center' as const
-                },
-                {
-                    title: 'Match',
-                    dataIndex: 'match',
-                    key: 'match',
-                    align: 'center' as const
-                }
-            ]}
-            pagination = {false}
+            dataSource={data}
+            columns={patternColumns}
+            pagination={false}
         />
-        </Flex>
     )
 }
 

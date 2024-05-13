@@ -5,13 +5,30 @@ import axios from "axios";
 
 import { UserContext } from '../context';
 
-import { PatternGroup, PatternGroupType } from "../components/PatternGroup"
-
 type CategorySelectOptionType = {
     category_id?:number,
     name?:string,
     value?:number,
     label?:string
+}
+
+type PatternGroupType = {
+    pattern_group_id?: number,
+    category_id?: number,
+    name: string,
+    patterns: PatternType[]
+}
+
+type PatternType = {
+    pattern_id?: number,
+    name: string,
+    regex_array: string[],
+    match_array: boolean[]
+}
+
+type PatternDataType = {
+    regex: string,
+    match: string
 }
 
 const Patterns:FC<{}> = () => {
@@ -46,7 +63,7 @@ const Patterns:FC<{}> = () => {
         .then((response) => {
             const patternGroups = response.data.patternGroups;
     
-            console.log(patternGroups);
+            console.log("Pattern groups", patternGroups);
             setPatternGroups(patternGroups);
         })
         .catch((error) => {
@@ -85,6 +102,73 @@ const Patterns:FC<{}> = () => {
         getPatternGroups();
         getCategories();
     }, []);
+
+    const groupColumns = [
+        {
+            title: "Group Name",
+            dataIndex: "name"
+        },
+        {
+            title: "Category ID",
+            dataIndex: "category_id"
+        }
+    ]
+
+    const renderPatternRegex = (pattern:PatternType) => {
+
+        const data: PatternDataType[] = [];
+
+        pattern.regex_array.forEach((e, i) => {
+            data.push({
+                regex: e,
+                match: pattern.match_array[i] ? "True" : "False"
+            });
+        });
+
+        const patternColumns = [
+            {
+                title: "regex",
+                dataIndex: "regex",
+            },
+            {
+                title: "match",
+                dataIndex: "match"
+            }
+        ];
+
+        return (
+            <>
+                <Table
+                    dataSource={data}
+                    columns={patternColumns}
+                    pagination={false}
+                />
+            </>
+        )
+    }
+
+    const renderPatternGroup = (patternGroup: PatternGroupType) => {
+        const patterns = patternGroup.patterns;
+
+        const patternColumns = [
+            {
+                title: "Pattern Name",
+                dataIndex: "name"
+            }
+        ];
+
+        return (
+            <>
+                <Table
+                    rowKey="pattern_id"
+                    dataSource={patterns}
+                    columns={patternColumns}
+                    expandable={{expandedRowRender: renderPatternRegex}}
+                    pagination={false}
+                />
+            </>
+        )
+    }
 
     return <>
         <Row gutter={200} justify={"center"}>
@@ -131,9 +215,12 @@ const Patterns:FC<{}> = () => {
             <h2>Pattern Groups</h2>
         </Row>
         <Row justify={"center"}>
-            {patternGroups.map((e:PatternGroupType) => {
-                return <PatternGroup getPatternGroups={getPatternGroups} name={e.name} patterns={e.patterns} category_id={e.category_id} pattern_group_id={e.pattern_group_id}/>
-            })}
+            <Table
+                rowKey="pattern_group_id"
+                dataSource={patternGroups}
+                columns={groupColumns}
+                expandable={{expandedRowRender: renderPatternGroup}}
+            />
         </Row>
     </>
 }

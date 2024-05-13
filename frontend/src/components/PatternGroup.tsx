@@ -1,5 +1,5 @@
 import { FC, useState, useContext } from "react"
-import { Flex, Form, Input, Button, Checkbox } from "antd"
+import { Flex, Form, Input, Button, Checkbox, Table } from "antd"
 import type { FormProps } from "antd";
 import axios from "axios";
 
@@ -24,6 +24,18 @@ export const PatternGroup:FC<props> = (props) => {
     
     const [showForm, setShowForm] = useState(false);
 
+    const columns = [
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name"
+        },
+        {
+            title: "Category ID",
+            dataIndex: "category_id",
+            key: "category_id"
+        }
+    ]
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log({
@@ -53,7 +65,7 @@ export const PatternGroup:FC<props> = (props) => {
     return (
         <Flex vertical style={{borderStyle: 'solid', width:400}}>
             <h3>Group: {name} ---{">"} Category: {category_id}</h3>
-
+            
             {/* Show patterns */}
             {patterns.map((e) => {
                 return <Pattern name={e.name} regex_array={e.regex_array} match_array={e.match_array}/>
@@ -61,48 +73,48 @@ export const PatternGroup:FC<props> = (props) => {
             
             {showForm ? 
                 <>
-                <Button onClick={() => {setShowForm(false)}}>Cancel</Button>
-                <Form
-                    name="pattern"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={{ match_array: true }}
-                    onFinish={handleSubmit}
-                    // onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                    
-                    <Form.Item
-                        label="Name"
-                        name="name"
-                        rules={[{ required: true, message: 'Please input the pattern name!' }]}
+                    <Button onClick={() => {setShowForm(false)}}>Cancel</Button>
+                    <Form
+                        name="pattern"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                        style={{ maxWidth: 600 }}
+                        initialValues={{ match_array: true }}
+                        onFinish={handleSubmit}
+                        // onFinishFailed={onFinishFailed}
+                        autoComplete="off"
                     >
-                        <Input />
-                    </Form.Item>
+                        
+                        <Form.Item
+                            label="Name"
+                            name="name"
+                            rules={[{ required: true, message: 'Please input the pattern name!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
 
-                    <Form.Item
-                        label="Regex"
-                        name="regex_array"
-                        rules={[{ required: true, message: 'Please input the regex to check for!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
+                        <Form.Item
+                            label="Regex"
+                            name="regex_array"
+                            rules={[{ required: true, message: 'Please input the regex to check for!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
 
-                    <Form.Item
-                        name="match_array"
-                        valuePropName="checked"
-                    >
-                        <Checkbox>Match regex</Checkbox>
-                    </Form.Item>
+                        <Form.Item
+                            name="match_array"
+                            valuePropName="checked"
+                        >
+                            <Checkbox>Match regex</Checkbox>
+                        </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
-                    
-                </Form>
+                        <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                        </Form.Item>
+                        
+                    </Form>
                 </>
             : 
                 <Button onClick={() => {setShowForm(true)}}>Add Pattern</Button>

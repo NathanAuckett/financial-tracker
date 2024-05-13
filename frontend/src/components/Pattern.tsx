@@ -8,7 +8,7 @@ export type PatternType = {
     match_array: boolean[]
 }
 
-type PatternDataType = {
+export type PatternDataType = {
     regex: string,
     match: string
 }

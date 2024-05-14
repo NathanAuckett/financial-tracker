@@ -8,8 +8,9 @@ import { Pattern, PatternType} from "../components/Pattern"
 import { UserContext } from '../context';
 
 export type PatternGroupType = {
-    pattern_group_id?: number,
-    category_id?: number,
+    pattern_group_id: number,
+    category_id: number,
+    category_name?: string,
     name: string,
     patterns: PatternType[]
 }
@@ -62,6 +63,9 @@ export const PatternGroup:FC<props> = (props) => {
         {
             title: "Pattern Name",
             dataIndex: "name"
+        },
+        {
+            title: "Actions"
         }
     ];
 

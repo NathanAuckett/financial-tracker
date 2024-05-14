@@ -8,15 +8,15 @@ import { UserContext } from '../context';
 import { PatternGroup, PatternGroupType } from '../components/PatternGroup'
 
 type CategorySelectOptionType = {
-    category_id?:number,
-    name?:string,
+    category_id:number,
+    name:string,
     value?:number,
     label?:string
 }
 
 const PatternGroups:FC<{}> = () => {
     const { userID } = useContext(UserContext);
-    const [patternGroups, setPatternGroups] = useState([]);
+    const [patternGroups, setPatternGroups] = useState<PatternGroupType[]>([]);
     const [categorySelectOptions, setCategorySelectOptions] = useState<CategorySelectOptionType[]>([]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
@@ -44,8 +44,12 @@ const PatternGroups:FC<{}> = () => {
             }
         })
         .then((response) => {
-            const patternGroups = response.data.patternGroups;
-    
+            const patternGroups:PatternGroupType[] = response.data.patternGroups;
+            
+            patternGroups.forEach((e) => {
+                e.category_name = getCategoryNameFromID(e.category_id);
+            });
+
             console.log("Pattern groups", patternGroups);
             setPatternGroups(patternGroups);
         })
@@ -68,12 +72,14 @@ const PatternGroups:FC<{}> = () => {
             categories.forEach(({category_id, name}) => {
                 const option = {
                     value: category_id,
+                    category_id: category_id,
+                    name: name,
                     label: name
                 }
                 options.push(option);
             });
 
-            console.log(options);
+            console.log("Category options", options);
             setCategorySelectOptions(options);
         })
         .catch((error) => {
@@ -81,9 +87,26 @@ const PatternGroups:FC<{}> = () => {
         });
     }
 
-    useEffect(() => {
+    function getCategoryNameFromID(categoryID:number):string{
+        const count = categorySelectOptions.length;
+
+        for (let i = 0; i < count; i ++){
+            if (categorySelectOptions[i].category_id === categoryID){
+                return categorySelectOptions[i].name
+            }
+        }
+
+        return "";
+    }
+
+    //Force order of data fetch. We need categories for the category names to be applied to pattern groups
+    async function getData(){
+        await getCategories();
         getPatternGroups();
-        getCategories();
+    }
+
+    useEffect(() => {
+        getData();
     }, []);
 
     const groupColumns = [
@@ -92,8 +115,11 @@ const PatternGroups:FC<{}> = () => {
             dataIndex: "name"
         },
         {
-            title: "Category ID",
-            dataIndex: "category_id"
+            title: "Category",
+            dataIndex: "category_name"
+        },
+        {
+            title: "Actions"
         }
     ];
 

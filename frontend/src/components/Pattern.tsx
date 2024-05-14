@@ -30,12 +30,15 @@ export const Pattern:FC<props> = (props) => {
 
     const patternColumns = [
         {
-            title: "regex",
+            title: "Regex",
             dataIndex: "regex",
         },
         {
-            title: "match",
+            title: "Match",
             dataIndex: "match"
+        },
+        {
+            title: "Actions"
         }
     ];
 

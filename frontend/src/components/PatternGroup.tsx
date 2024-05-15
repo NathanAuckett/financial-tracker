@@ -6,7 +6,7 @@ import axios from "axios";
 import { Pattern } from "../components/Pattern"
 import type { PatternGroupType, PatternType } from "../types"
 
-import { UserContext } from '../context';
+import { UserContext, MessageContext } from '../context';
 
 import FieldControls from '../components/FieldControls';
 import EditableTableField from "../components/EditableTableField";
@@ -36,7 +36,7 @@ export const PatternGroup:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const { patternGroup, getPatternGroups } = props;
     const [ patterns, setPatterns ] = useState<PatternRow[]>(patternGroup.patterns as PatternRow[]);
-    //const patterns = patternGroup.patterns as PatternRow[];
+    const { showMessage } = useContext(MessageContext);
     
     const [showForm, setShowForm] = useState(false);
 
@@ -64,14 +64,31 @@ export const PatternGroup:FC<props> = (props) => {
             console.log(error);
         });
     }
+
+    async function handlePatternDelete(pattern_id:number){
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}patterns/delete-pattern`, {
+            params: {
+                pattern_id: pattern_id
+            }
+        })
+        .then(() => {
+            showMessage("success", "Pattern Deleted!");
+            getPatternGroups();
+        })
+        .catch((error:Error) => {
+            showMessage("error", "CSV Format deletion failed!");
+            console.log(error.message);
+        });
+    }
     
     useEffect(() => {
-        patterns.forEach((e) => {
+        const updatedPatterns = patternGroup.patterns as PatternRow[];
+        updatedPatterns.forEach((e) => {
             patternSetNewValueDefaults(e);
         });
-        setPatterns([...patterns]);
+        setPatterns(updatedPatterns);
         console.log("Patterns", patterns);
-    }, []);
+    }, [patternGroup]);
 
     function renderPatternRegex(pattern:PatternType) {
         return (
@@ -101,7 +118,7 @@ export const PatternGroup:FC<props> = (props) => {
                             setPatterns([...patterns]);
                         }}
                         handleEdit = {() => {}}
-                        handleDelete = {() => {}}
+                        handleDelete = {() => {handlePatternDelete(pattern_id)}}
                     />
                 )
             }

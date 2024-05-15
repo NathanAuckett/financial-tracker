@@ -36,19 +36,18 @@ async function getPatterns(req:Request, res: Response) {
 }
 
 async function deletePattern(req:Request, res: Response){
-    const { user_id, pattern_id } = req.query;
+    const { pattern_id } = req.query;
 
-    if (!user_id || !pattern_id){
+    if (!pattern_id){
         return res.status(400).json({
-            message: 'Delete failed! Missing user_id or pattern_id from request.',
+            message: 'Delete failed! Missing pattern_id from request.',
             query: req.query
         }); 
     }
 
     await Pattern.destroy({
         where: {
-            user_id: user_id,
-            category_id: pattern_id
+            pattern_id: pattern_id
         }
     })
     .then((response:object[]) => {

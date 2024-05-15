@@ -21,16 +21,6 @@ type CSVFormatRow = CSVFormat & {
     newType: string;
     newBalance: string;
 }
-// const FormatRowDefaults = {
-//     editing: false,
-//     newBankName: "",
-//     newAccountNumber: "",
-//     newTransactionDate: "",
-//     newCredit: "",
-//     newDebit: "",
-//     newType: "",
-//     newBalance: ""
-// }
 
 function formatSetNewValueDefaults(format:CSVFormatRow, editing = false){
     format.editing = editing;

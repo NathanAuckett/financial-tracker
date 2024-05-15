@@ -35,7 +35,74 @@ async function getPatterns(req:Request, res: Response) {
     }); 
 }
 
+async function deletePattern(req:Request, res: Response){
+    const { user_id, pattern_id } = req.query;
+
+    if (!user_id || !pattern_id){
+        return res.status(400).json({
+            message: 'Delete failed! Missing user_id or pattern_id from request.',
+            query: req.query
+        }); 
+    }
+
+    await Pattern.destroy({
+        where: {
+            user_id: user_id,
+            category_id: pattern_id
+        }
+    })
+    .then((response:object[]) => {
+        return res.status(201).json({
+            message: "Delete successful!",
+            response
+        }); 
+    })
+    .catch((error:Error) => {
+        return res.status(400).json({
+            error: error.message
+        }); 
+    });
+}
+
+async function updatePattern(req:Request, res: Response) {
+    const { user_id, pattern_id} = req.body;
+
+    //spread body into new obj and remove identifiers
+    const updateValues = {...req.body}
+    delete updateValues.user_id;
+    delete updateValues.pattern_id;
+
+    if (!user_id || !pattern_id || !Object.keys(updateValues).length){
+        return res.status(400).json({
+            message: 'Update failed! Missing user_id, pattern_id, or no update data provided.',
+            query: req.body
+        }); 
+    }
+
+    await Pattern.update(updateValues,
+        {
+            where: {
+                user_id: user_id,
+                pattern_id: pattern_id
+            }
+        }
+    )
+    .then((response:object[]) => {
+        return res.status(201).json({
+            message: "Update successful!",
+            response
+        }); 
+    })
+    .catch((error:Error) => {
+        return res.status(400).json({
+            error: error.message
+        }); 
+    });
+}
+
 module.exports = {
     createPattern,
-    getPatterns
+    getPatterns,
+    deletePattern,
+    updatePattern
 }

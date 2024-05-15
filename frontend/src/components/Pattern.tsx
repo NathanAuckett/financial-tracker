@@ -1,12 +1,14 @@
 import { FC } from "react"
-import { Flex, Table } from "antd"
+import { Table } from "antd"
 
-export type PatternType = {
-    pattern_id?: number,
-    name: string,
-    regex_array: string[],
-    match_array: boolean[]
-}
+import type { PatternType } from "../types";
+
+// export type PatternType = {
+//     pattern_id?: number,
+//     name: string,
+//     regex_array: string[],
+//     match_array: boolean[]
+// }
 
 export type PatternDataType = {
     regex: string,

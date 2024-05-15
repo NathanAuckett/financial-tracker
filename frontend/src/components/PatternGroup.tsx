@@ -1,30 +1,42 @@
-import { FC, useState, useContext } from "react"
+import { FC, useState, useContext, useEffect } from "react"
 import { Flex, Form, Input, Button, Checkbox, Table } from "antd"
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { Pattern, PatternType} from "../components/Pattern"
+import { Pattern } from "../components/Pattern"
+import type { PatternGroupType, PatternType } from "../types"
 
 import { UserContext } from '../context';
 
-export type PatternGroupType = {
-    pattern_group_id: number,
-    category_id: number,
-    category_name?: string,
-    name: string,
-    patterns: PatternType[]
+import FieldControls from '../components/FieldControls';
+import EditableTableField from "../components/EditableTableField";
+
+type PatternRow = PatternType & {
+    editing: boolean;
+    newName: string;
+}
+
+function patternSetNewValueDefaults(pattern:PatternRow, editing = false){
+    pattern.editing = editing;
+    pattern.newName = pattern.name;
+}
+
+function findPatternFromID(patterns:PatternRow[], pattern_id:number){
+    const index = patterns.findIndex((e) => { //spread found element into object
+        return e.pattern_id === pattern_id;
+    })
+    return patterns[index];
 }
 
 interface props {
     patternGroup: PatternGroupType;
     getPatternGroups: Function;
 }
-
 export const PatternGroup:FC<props> = (props) => {
     const { userID } = useContext(UserContext);
     const { patternGroup, getPatternGroups } = props;
-    const patterns = patternGroup.patterns;
-    console.log("Patterns", patterns);
+    const [ patterns, setPatterns ] = useState<PatternRow[]>(patternGroup.patterns as PatternRow[]);
+    //const patterns = patternGroup.patterns as PatternRow[];
     
     const [showForm, setShowForm] = useState(false);
 
@@ -53,6 +65,14 @@ export const PatternGroup:FC<props> = (props) => {
         });
     }
     
+    useEffect(() => {
+        patterns.forEach((e) => {
+            patternSetNewValueDefaults(e);
+        });
+        setPatterns([...patterns]);
+        console.log("Patterns", patterns);
+    }, []);
+
     function renderPatternRegex(pattern:PatternType) {
         return (
             <Pattern pattern={pattern}/>
@@ -65,7 +85,26 @@ export const PatternGroup:FC<props> = (props) => {
             dataIndex: "name"
         },
         {
-            title: "Actions"
+            title: "Actions",
+            align: 'right' as const,
+            render: (text:string, {pattern_id}:PatternType, index:number) => {
+                const thisRow = findPatternFromID(patterns, pattern_id);
+                const editing = thisRow?.editing || false; //ensures it defaults to false if editing cannot be found
+                return (
+                    <FieldControls
+                        editing = {editing}
+                        setEditing = {() => {
+                            thisRow.editing = !editing;
+                            if (thisRow.editing){//set to default on edit start
+                                patternSetNewValueDefaults(thisRow, true);
+                            }
+                            setPatterns([...patterns]);
+                        }}
+                        handleEdit = {() => {}}
+                        handleDelete = {() => {}}
+                    />
+                )
+            }
         }
     ];
 

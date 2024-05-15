@@ -5,7 +5,8 @@ import axios from "axios";
 
 import { UserContext } from '../context';
 
-import { PatternGroup, PatternGroupType } from '../components/PatternGroup'
+import { PatternGroup } from '../components/PatternGroup'
+import type { PatternGroupType } from '../types';
 
 type CategorySelectOptionType = {
     category_id:number,
@@ -87,8 +88,9 @@ const PatternGroups:FC<{}> = () => {
         });
     }
 
-    function getCategoryNameFromID(categoryID:number):string{
+    function getCategoryNameFromID(categoryID:number):string {
         const count = categorySelectOptions.length;
+        console.log(count);
 
         for (let i = 0; i < count; i ++){
             if (categorySelectOptions[i].category_id === categoryID){
@@ -98,16 +100,13 @@ const PatternGroups:FC<{}> = () => {
 
         return "";
     }
-
-    //Force order of data fetch. We need categories for the category names to be applied to pattern groups
-    async function getData(){
-        await getCategories();
-        getPatternGroups();
-    }
+    useEffect(() => {
+        getCategories();
+    }, []);
 
     useEffect(() => {
-        getData();
-    }, []);
+        getPatternGroups();
+    }, [categorySelectOptions]);
 
     const groupColumns = [
         {

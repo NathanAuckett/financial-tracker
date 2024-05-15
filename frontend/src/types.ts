@@ -22,3 +22,18 @@ export type CSVFormat = {
     type: string;
     balance: string;
 }
+
+export type PatternGroupType = {
+    pattern_group_id: number,
+    category_id: number,
+    category_name?: string,
+    name: string,
+    patterns: PatternType[]
+}
+
+export type PatternType = {
+    pattern_id: number,
+    name: string,
+    regex_array: string[],
+    match_array: boolean[]
+}

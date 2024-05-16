@@ -3,13 +3,13 @@ import { Flex, Form, Input, Button, Checkbox, Table } from "antd"
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { Pattern } from "../components/Pattern"
-import type { PatternGroupType, PatternType } from "../types"
-
 import { UserContext, MessageContext } from '../context';
 
+import { Pattern } from "../components/Pattern"
 import FieldControls from '../components/FieldControls';
 import EditableTableField from "../components/EditableTableField";
+
+import type { PatternGroupType, PatternType } from "../types"
 
 type PatternRow = PatternType & {
     editing: boolean;
@@ -80,6 +80,29 @@ export const PatternGroup:FC<props> = (props) => {
             console.log(error.message);
         });
     }
+
+    async function handlePatternEdit(pattern_id:number){
+        const row = findPatternFromID(patterns, pattern_id);
+        if (row.name !== row.newName){
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}patterns/update-pattern`, {
+                pattern_id: pattern_id,
+                name: row.newName
+            })
+            .then(() => {
+                showMessage("success", "Pattern Updated!");
+                getPatternGroups();
+            })
+            .catch((error:Error) => {
+                showMessage("error", "Pattern edit failed!");
+                console.log(error.message);
+            });
+        }
+        else{
+            console.log("nothing changed");
+            row.editing = false;
+            setPatterns([...patterns]);
+        }
+    }
     
     useEffect(() => {
         const updatedPatterns = patternGroup.patterns as PatternRow[];
@@ -99,7 +122,20 @@ export const PatternGroup:FC<props> = (props) => {
     const patternColumns = [
         {
             title: "Pattern Name",
-            dataIndex: "name"
+            dataIndex: "name",
+            render: (text:string, {pattern_id, name}:PatternRow, index:number) => {
+                const thisRow = findPatternFromID(patterns, pattern_id);
+                return (
+                    <EditableTableField
+                        currentValue={name}
+                        row={thisRow}
+                        onChange={( element:{ target:{value:string} } ) => {
+                            thisRow.newName = element.target.value;
+                            setPatterns([...patterns]);
+                        }}
+                    />
+                )
+            }
         },
         {
             title: "Actions",
@@ -117,7 +153,7 @@ export const PatternGroup:FC<props> = (props) => {
                             }
                             setPatterns([...patterns]);
                         }}
-                        handleEdit = {() => {}}
+                        handleEdit = {() => {handlePatternEdit(pattern_id)}}
                         handleDelete = {() => {handlePatternDelete(pattern_id)}}
                     />
                 )

@@ -64,16 +64,16 @@ async function deletePattern(req:Request, res: Response){
 }
 
 async function updatePattern(req:Request, res: Response) {
-    const { user_id, pattern_id} = req.body;
+    const { pattern_id } = req.body;
 
     //spread body into new obj and remove identifiers
     const updateValues = {...req.body}
     delete updateValues.user_id;
     delete updateValues.pattern_id;
 
-    if (!user_id || !pattern_id || !Object.keys(updateValues).length){
+    if (!pattern_id || !Object.keys(updateValues).length){
         return res.status(400).json({
-            message: 'Update failed! Missing user_id, pattern_id, or no update data provided.',
+            message: 'Update failed! Missing pattern_id, or no update data provided.',
             query: req.body
         }); 
     }
@@ -81,7 +81,6 @@ async function updatePattern(req:Request, res: Response) {
     await Pattern.update(updateValues,
         {
             where: {
-                user_id: user_id,
                 pattern_id: pattern_id
             }
         }

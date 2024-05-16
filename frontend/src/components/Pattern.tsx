@@ -1,9 +1,9 @@
 import { FC } from "react"
 import { Table } from "antd"
 
-import type { PatternType } from "../types";
+import type { PatternType, PatternRuleType } from "../types";
 
-export type PatternDataType = {
+type PatternRuleDisplayType = {
     regex: string,
     match: string
 }
@@ -14,14 +14,27 @@ interface props {
 
 export const Pattern:FC<props> = (props) => {
     const { pattern } = props;
-    const data: PatternDataType[] = [];
+    const rules: PatternRuleDisplayType[] = [];
 
     pattern.regex_array.forEach((e, i) => {
-        data.push({
+        rules.push({
             regex: e,
             match: pattern.match_array[i] ? "True" : "False"
         });
     });
+
+    
+    function patternDisplayRulesToPatternRules(rules: PatternRuleDisplayType[]): PatternRuleType{
+        const regexArray:string[] = [];
+        const matchArray:boolean[] = [];
+
+        rules.forEach((e) => {
+            regexArray.push(e.regex);
+            matchArray.push(e.match === "True" ? true : false);
+        });
+
+        return {regex_array: regexArray, match_array: matchArray}
+    }
 
     const patternColumns = [
         {
@@ -39,7 +52,7 @@ export const Pattern:FC<props> = (props) => {
 
     return (
         <Table
-            dataSource={data}
+            dataSource={rules}
             columns={patternColumns}
             pagination={false}
         />

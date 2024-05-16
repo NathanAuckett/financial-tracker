@@ -31,9 +31,12 @@ export type PatternGroupType = {
     patterns: PatternType[]
 }
 
+export type PatternRuleType = {
+    regex_array: string[];
+    match_array: boolean[];
+}
 export type PatternType = {
     pattern_id: number,
-    name: string,
-    regex_array: string[],
-    match_array: boolean[]
+    name: string
 }
+& PatternRuleType;

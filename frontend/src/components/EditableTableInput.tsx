@@ -2,7 +2,7 @@ import { FC } from "react";
 import { Input } from "antd";
 
 
-const EditableTableField:FC<{currentValue:string, row:{editing:boolean}, onChange:Function, style?:React.CSSProperties}> = (props) => {
+export const EditableTableInput:FC<{currentValue:string, row:{editing:boolean}, onChange:Function, style?:React.CSSProperties}> = (props) => {
     const {currentValue, row, onChange, style} = props;
     
     const defaultStyle:React.CSSProperties = {display: 'inline', textAlign: 'center'};
@@ -25,4 +25,4 @@ const EditableTableField:FC<{currentValue:string, row:{editing:boolean}, onChang
     )
 }
 
-export default EditableTableField;
+export default EditableTableInput;

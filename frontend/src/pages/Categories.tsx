@@ -9,7 +9,7 @@ import { UserContext, MessageContext } from '../context';
 import type { Category } from '../types';
 
 import FieldControls from '../components/FieldControls';
-import EditableTableField from '../components/EditableTableField';
+import EditableTableInput from '../components/EditableTableInput';
 
 type CategoryRow = Category & {
     editing: boolean;
@@ -113,7 +113,7 @@ const Categories:FC<{}> = () => {
             render: (text:string, {category_id, name}:Category, index:number) => {
                 const thisRow = findCategoryIndexFromID(categories, category_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={name}
                         row={thisRow}
                         onChange={( element:{ target:{value:string} } ) => {

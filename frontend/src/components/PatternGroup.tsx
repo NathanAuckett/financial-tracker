@@ -7,7 +7,7 @@ import { UserContext, MessageContext } from '../context';
 
 import { Pattern } from "../components/Pattern"
 import FieldControls from '../components/FieldControls';
-import EditableTableField from "../components/EditableTableField";
+import EditableTableField from "./EditableTableInput";
 
 import type { PatternGroupType, PatternType } from "../types"
 

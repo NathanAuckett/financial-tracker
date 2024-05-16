@@ -7,7 +7,7 @@ import { UserContext, MessageContext} from '../context';
 import type { CSVFormat } from "../types";
 
 import FieldControls from '../components/FieldControls';
-import EditableTableField from "../components/EditableTableField";
+import EditableTableInput from "../components/EditableTableInput";
 
 type CSVFormatRow = CSVFormat & {
     [index: string]: string | boolean;
@@ -163,7 +163,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, bank_name}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={bank_name}
                         row={thisRow}
                         style={inputStyle}
@@ -183,7 +183,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, account_number}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={account_number}
                         row={thisRow}
                         style={inputStyle}
@@ -203,7 +203,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, transaction_date}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={transaction_date}
                         row={thisRow}
                         style={inputStyle}
@@ -223,7 +223,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, credit}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={credit}
                         row={thisRow}
                         style={inputStyle}
@@ -243,7 +243,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, debit}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={debit}
                         row={thisRow}
                         style={inputStyle}
@@ -263,7 +263,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, description}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={description}
                         row={thisRow}
                         style={inputStyle}
@@ -283,7 +283,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, type}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={type}
                         row={thisRow}
                         style={inputStyle}
@@ -303,7 +303,7 @@ export const CSVFormats:FC = () => {
             render: (text:string, {csv_format_id, balance}:CSVFormatRow, index:number) => {
                 const thisRow = findCSVFormatFromID(formats, csv_format_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={balance}
                         row={thisRow}
                         style={inputStyle}

@@ -5,8 +5,16 @@ import axios from "axios";
 
 import { UserContext } from '../context';
 
+import FieldControls from '../components/FieldControls'
+import EditableTableInput from '../components/EditableTableInput';
 import { PatternGroup } from '../components/PatternGroup'
 import type { PatternGroupType } from '../types';
+
+type PatternGroupRow = PatternGroupType & {
+    editing: boolean;
+    newName: string;
+    newCategoryID: number;
+}
 
 type CategorySelectOptionType = {
     category_id:number,
@@ -15,9 +23,22 @@ type CategorySelectOptionType = {
     label?:string
 }
 
+function patternGroupSetNewValueDefaults(patternGroup:PatternGroupRow, editing = false){
+    patternGroup.editing = editing;
+    patternGroup.newName = patternGroup.name;
+    patternGroup.newCategoryID = patternGroup.category_id;
+}
+
+function findPatternGroupFromID(patternGroup:PatternGroupRow[], pattern_group_id:number){
+    const index = patternGroup.findIndex((e) => { //spread found element into object
+        return e.pattern_group_id === pattern_group_id;
+    })
+    return patternGroup[index];
+}
+
 const PatternGroups:FC<{}> = () => {
     const { userID } = useContext(UserContext);
-    const [patternGroups, setPatternGroups] = useState<PatternGroupType[]>([]);
+    const [patternGroups, setPatternGroups] = useState<PatternGroupRow[]>([]);
     const [categorySelectOptions, setCategorySelectOptions] = useState<CategorySelectOptionType[]>([]);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
@@ -45,10 +66,11 @@ const PatternGroups:FC<{}> = () => {
             }
         })
         .then((response) => {
-            const patternGroups:PatternGroupType[] = response.data.patternGroups;
+            const patternGroups:PatternGroupRow[] = response.data.patternGroups;
             
             patternGroups.forEach((e) => {
                 e.category_name = getCategoryNameFromID(e.category_id);
+                patternGroupSetNewValueDefaults(e);
             });
 
             console.log("Pattern groups", patternGroups);
@@ -100,6 +122,15 @@ const PatternGroups:FC<{}> = () => {
 
         return "";
     }
+
+    async function handlePatternGroupEdit(){
+        
+    }
+
+    async function handlePatternGroupDelete(){
+
+    }
+
     useEffect(() => {
         getCategories();
     }, []);
@@ -111,14 +142,67 @@ const PatternGroups:FC<{}> = () => {
     const groupColumns = [
         {
             title: "Group Name",
-            dataIndex: "name"
+            dataIndex: "name",
+            align: "left" as const,
+            render: (text:string, {pattern_group_id, name}:PatternGroupRow, index:number) => {
+                const thisRow = findPatternGroupFromID(patternGroups, pattern_group_id);
+                return (
+                    <EditableTableInput
+                        currentValue={name}
+                        row={thisRow}
+                        style={{width: "8rem"}}
+                        onChange={( element:{ target:{value:string} } ) => {
+                            thisRow.newName = element.target.value;
+                            setPatternGroups([...patternGroups]);
+                        }}
+                    />
+                )
+            }
         },
         {
             title: "Category",
-            dataIndex: "category_name"
+            dataIndex: "category_name",
+            render: (text:string, {pattern_group_id, name}:PatternGroupRow, index:number) => {
+                const thisRow = findPatternGroupFromID(patternGroups, pattern_group_id);
+                return (
+                    <>
+                        {thisRow.editing ?
+                            <Select
+                                defaultValue={name}
+                                options = {categorySelectOptions}
+                                onChange = {(value) => {
+                                    thisRow.newCategoryID = parseInt(value);
+                                    setPatternGroups([...patternGroups]);
+                                }}
+                            />
+                        :
+                            <p style = {{display:"inline", marginRight: 5}}>{name}</p>
+                        }
+                    </>
+                )
+            }
         },
         {
-            title: "Actions"
+            title: "Actions",
+            align: 'right' as const,
+            render: (text:string, {pattern_group_id}:PatternGroupRow, index:number) => {
+                const thisRow = findPatternGroupFromID(patternGroups, pattern_group_id);
+                const editing = thisRow?.editing || false; //ensures it defaults to false if editing cannot be found
+                return (
+                    <FieldControls
+                        editing = {editing}
+                        setEditing = {() => {
+                            thisRow.editing = !editing;
+                            if (thisRow.editing){//set to default on edit start
+                                patternGroupSetNewValueDefaults(thisRow, true);
+                            }
+                            setPatternGroups([...patternGroups]);
+                        }}
+                        handleEdit = {() => {}}
+                        handleDelete = {() => {}}
+                    />
+                )
+            }
         }
     ];
 
@@ -128,59 +212,62 @@ const PatternGroups:FC<{}> = () => {
         )
     }
 
-    return <>
-        <Row gutter={200} justify={"center"}>
-            <Card key={0} title="New Pattern Group" style={{width:800}}>
-                <Form
-                    name="pattern"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={{ match_array: true }}
-                    onFinish={handleSubmit}
-                    // onFinishFailed={onFinishFailed}
-                    autoComplete="off"
-                >
-                
-                    <Form.Item
-                        label="Name"
-                        name="name"
-                        rules={[{ required: true, message: 'Please input the group name!' }]}
+    return (
+        <>
+            <Row gutter={200} justify={"center"}>
+                <Card key={0} title="New Pattern Group" style={{width:800}}>
+                    <Form
+                        name="pattern"
+                        labelCol={{ span: 8 }}
+                        wrapperCol={{ span: 16 }}
+                        style={{ maxWidth: 600 }}
+                        initialValues={{ match_array: true }}
+                        onFinish={handleSubmit}
+                        // onFinishFailed={onFinishFailed}
+                        autoComplete="off"
                     >
-                        <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="Category to match"
-                        name="category_id"
-                        rules={[{ required: true, message: 'Please input the category for this group to match into!' }]}
-                    >
-                        <Select
-                            options = {categorySelectOptions}
-                        />
-                    </Form.Item>
-
-                    <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
-                    </Form.Item>
                     
-                </Form>
-            </Card>
-        </Row>
-        <Row gutter={16} justify={"center"}>
-            <h2>Pattern Groups</h2>
-        </Row>
-        <Row justify={"center"}>
-            <Table
-                rowKey="pattern_group_id"
-                dataSource={patternGroups}
-                columns={groupColumns}
-                expandable={{expandedRowRender: renderPatternGroup}}
-            />
-        </Row>
-    </>
+                        <Form.Item
+                            label="Name"
+                            name="name"
+                            rules={[{ required: true, message: 'Please input the group name!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Category to match"
+                            name="category_id"
+                            rules={[{ required: true, message: 'Please input the category for this group to match into!' }]}
+                        >
+                            <Select
+                                options = {categorySelectOptions}
+                            />
+                        </Form.Item>
+
+                        <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
+                            <Button type="primary" htmlType="submit">
+                                Submit
+                            </Button>
+                        </Form.Item>
+                        
+                    </Form>
+                </Card>
+            </Row>
+            <Row gutter={16} justify={"center"}>
+                <h2>Pattern Groups</h2>
+            </Row>
+            <Row justify={"center"}>
+                <Table
+                    id='pattern-group-table'
+                    rowKey="pattern_group_id"
+                    dataSource={patternGroups}
+                    columns={groupColumns}
+                    expandable={{expandedRowRender: renderPatternGroup}}
+                />
+            </Row>
+        </>
+    )
 }
 
 export default PatternGroups;

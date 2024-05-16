@@ -7,7 +7,7 @@ import { UserContext, AccountsContext, AccountsContextType, MessageContext } fro
 import type { Account } from "../types";
 
 import FieldControls from '../components/FieldControls';
-import EditableTableField from "../components/EditableTableField";
+import EditableTableInput from "../components/EditableTableInput";
 
 type AccountRow = Account & {
     editing: boolean;
@@ -111,7 +111,7 @@ const Accounts:FC = () => {
             render: (text:string, {bank_account_id, name}:Account, index:number) => {
                 const thisRow = findAccountIndexFromID(accounts, bank_account_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={name}
                         row={thisRow}
                         onChange={( element:{ target:{value:string} } ) => {
@@ -130,7 +130,7 @@ const Accounts:FC = () => {
             render: (text:string, {bank_account_id, account_number}:Account, index:number) => {
                 const thisRow = findAccountIndexFromID(accounts, bank_account_id);
                 return (
-                    <EditableTableField
+                    <EditableTableInput
                         currentValue={account_number}
                         row={thisRow}
                         onChange={( element:{ target:{value:string} } ) => {

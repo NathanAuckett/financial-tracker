@@ -9,7 +9,7 @@ interface IChart {
     editing:boolean;
     setEditing:Function;
 }
-const FieldControls:FC<IChart> = (props) => {
+export const FieldControls:FC<IChart> = (props) => {
     const { handleEdit, handleDelete, editing, setEditing } = props;
 
     return (

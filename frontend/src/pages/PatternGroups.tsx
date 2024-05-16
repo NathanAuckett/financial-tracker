@@ -3,7 +3,7 @@ import { Card, Row, Button, Form, Input, Table, Select } from "antd";
 import type { FormProps } from "antd";
 import axios from "axios";
 
-import { UserContext } from '../context';
+import { UserContext, MessageContext } from '../context';
 
 import FieldControls from '../components/FieldControls'
 import EditableTableInput from '../components/EditableTableInput';
@@ -40,6 +40,7 @@ const PatternGroups:FC<{}> = () => {
     const { userID } = useContext(UserContext);
     const [patternGroups, setPatternGroups] = useState<PatternGroupRow[]>([]);
     const [categorySelectOptions, setCategorySelectOptions] = useState<CategorySelectOptionType[]>([]);
+    const { showMessage } = useContext(MessageContext);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
         console.log(values);
@@ -123,12 +124,46 @@ const PatternGroups:FC<{}> = () => {
         return "";
     }
 
-    async function handlePatternGroupEdit(){
-        
+    async function handlePatternGroupEdit(pattern_group_id:number){
+        const row = findPatternGroupFromID(patternGroups, pattern_group_id);
+        if (row.name !== row.newName || row.category_id !== row.newCategoryID){
+            await axios.patch(`${process.env.REACT_APP_API_ROOT}pattern-groups/update-pattern-group`, {
+                user_id: userID,
+                pattern_group_id: pattern_group_id,
+                name: row.newName,
+                category_id: row.newCategoryID
+            })
+            .then(() => {
+                showMessage("success", "Pattern Group Updated!");
+                getPatternGroups();
+            })
+            .catch((error:Error) => {
+                showMessage("error", "Pattern Group edit failed!");
+                console.log(error.message);
+            });
+        }
+        else{
+            console.log("nothing changed");
+            row.editing = false;
+            setPatternGroups([...patternGroups]);
+        }
     }
 
-    async function handlePatternGroupDelete(){
-
+    async function handlePatternGroupDelete(pattern_group_id:number){
+        await axios.delete(`${process.env.REACT_APP_API_ROOT}pattern-groups/delete-pattern-group`, {
+            params: {
+                user_id: userID,
+                pattern_group_id: pattern_group_id
+            }
+        })
+        .then(() => {
+            showMessage("success", "Pattern Group Deleted!");
+            getPatternGroups();
+        })
+        .catch((error:Error) => {
+            showMessage("error", "Pattern Group deletion failed!");
+            console.log(error.message);
+        });
     }
 
     useEffect(() => {
@@ -162,13 +197,13 @@ const PatternGroups:FC<{}> = () => {
         {
             title: "Category",
             dataIndex: "category_name",
-            render: (text:string, {pattern_group_id, name}:PatternGroupRow, index:number) => {
+            render: (text:string, {pattern_group_id, category_name}:PatternGroupRow, index:number) => {
                 const thisRow = findPatternGroupFromID(patternGroups, pattern_group_id);
                 return (
                     <>
                         {thisRow.editing ?
                             <Select
-                                defaultValue={name}
+                                defaultValue={category_name}
                                 options = {categorySelectOptions}
                                 onChange = {(value) => {
                                     thisRow.newCategoryID = parseInt(value);
@@ -176,7 +211,7 @@ const PatternGroups:FC<{}> = () => {
                                 }}
                             />
                         :
-                            <p style = {{display:"inline", marginRight: 5}}>{name}</p>
+                            <p style = {{display:"inline", marginRight: 5}}>{category_name}</p>
                         }
                     </>
                 )
@@ -198,8 +233,8 @@ const PatternGroups:FC<{}> = () => {
                             }
                             setPatternGroups([...patternGroups]);
                         }}
-                        handleEdit = {() => {}}
-                        handleDelete = {() => {}}
+                        handleEdit = {() => {handlePatternGroupEdit(pattern_group_id)}}
+                        handleDelete = {() => {handlePatternGroupDelete(pattern_group_id)}}
                     />
                 )
             }

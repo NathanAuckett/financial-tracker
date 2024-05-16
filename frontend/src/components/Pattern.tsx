@@ -3,13 +3,6 @@ import { Table } from "antd"
 
 import type { PatternType } from "../types";
 
-// export type PatternType = {
-//     pattern_id?: number,
-//     name: string,
-//     regex_array: string[],
-//     match_array: boolean[]
-// }
-
 export type PatternDataType = {
     regex: string,
     match: string

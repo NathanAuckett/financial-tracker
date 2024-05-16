@@ -72,7 +72,7 @@ async function updateCSVFormat(req:Request, res: Response) {
 
     if (!user_id || !csv_format_id || !Object.keys(updateValues).length){
         return res.status(400).json({
-            message: 'Update failed! Missing user_id, bank_account_id, or no update data provided.',
+            message: 'Update failed! Missing user_id, csv_format_id, or no update data provided.',
             query: req.body
         }); 
     }

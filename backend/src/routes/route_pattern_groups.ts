@@ -11,4 +11,8 @@ router.get("/", (req, res) => {
 
 router.get("/get-pattern-groups", controller.getPatternGroups);
 
+router.delete("/delete-pattern-group", controller.deletePatternGroup);
+
+router.patch("/update-pattern-group", controller.updatePatternGroup);
+
 module.exports = router;

@@ -5,9 +5,10 @@ import axios from "axios";
 
 import { UserContext, MessageContext } from '../context';
 
-import { Pattern } from "../components/Pattern"
-import FieldControls from '../components/FieldControls';
+import { Pattern } from "./Pattern"
+import FieldControls from './FieldControls';
 import EditableTableField from "./EditableTableInput";
+import PatternInput from "./PatternInput";
 
 import type { PatternGroupType, PatternType } from "../types"
 
@@ -41,14 +42,6 @@ export const PatternGroup:FC<props> = (props) => {
     const [showForm, setShowForm] = useState(false);
 
     const handleSubmit:FormProps['onFinish'] = async (values) => {
-        console.log("Submit", {
-            user_id: userID,
-            pattern_group_id: patternGroup.pattern_group_id,
-            name: values.name,
-            regex_array: values.regex_array,
-            match_array: values.match_array
-        });
-        
         await axios.post(`${process.env.REACT_APP_API_ROOT}patterns/pattern`, {
             pattern_group_id: patternGroup.pattern_group_id,
             name: values.name,
@@ -215,6 +208,7 @@ export const PatternGroup:FC<props> = (props) => {
                         </Form.Item>
                         
                     </Form>
+                    <PatternInput/>
                 </>
             : 
                 <Button onClick={() => {setShowForm(true)}}>Add Pattern</Button>

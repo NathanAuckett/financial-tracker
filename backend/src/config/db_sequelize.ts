@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize('financial_tracker', 'postgres', 'admin22501234', {
+const sequelize = new Sequelize(process.env.DB_NAME as string, 'postgres', process.env.DB_PASS, {
     host: 'localhost',
     dialect: 'postgres'
 });
